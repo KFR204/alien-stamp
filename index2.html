@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ALIEN ШТАМП — прототип 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #010302;
+    --bone: #c4cdbd;
+    --bone-dim: #5d6d61;
+    --accent: #7fc796;
+    --term: #8fd16a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: var(--void); overflow: hidden; color: var(--bone); font-family: 'IBM Plex Mono', monospace; }
+
+  .layer { position: fixed; inset: 0; width: 100%; height: 100%; }
+  #bg { position: fixed; left: 0; top: 0; max-width: none; will-change: transform; }
+  #bgShade { pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(1,5,3,.55) 0%, transparent 30%),
+      linear-gradient(180deg, transparent 55%, rgba(1,5,3,.7) 100%),
+      radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(1,8,5,.55) 100%); }
+  #shake { position: fixed; inset: 0; }
+  #world { cursor: crosshair; }
+  #fg { pointer-events: none; }
+
+  .fog { position: fixed; inset: -20%; pointer-events: none; mix-blend-mode: screen; opacity: .22;
+    background:
+      radial-gradient(ellipse 45% 14% at 35% 50%, rgba(110,200,140,.35), transparent 70%),
+      radial-gradient(ellipse 40% 12% at 72% 46%, rgba(90,170,120,.3), transparent 70%);
+    animation: drift 26s ease-in-out infinite alternate; }
+  .fog.b { animation-duration: 38s; animation-direction: alternate-reverse; opacity: .16; }
+  @keyframes drift { from { transform: translate3d(-4%,2%,0); } to { transform: translate3d(5%,-3%,0); } }
+  #pulse { position: fixed; inset: 0; pointer-events: none; mix-blend-mode: screen;
+    background: radial-gradient(ellipse 22% 24% at 55% 38%, rgba(120,220,150,.12), transparent 70%);
+    animation: breathe 6s ease-in-out infinite; }
+  @keyframes breathe { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+
+  #scan { position: fixed; inset: 0; pointer-events: none; opacity: .45; mix-blend-mode: multiply;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.2) 0 1px, transparent 1px 3px); }
+  #vignette { position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(0,0,0,.78) 100%); }
+  #dim { position: fixed; inset: 0; pointer-events: none; background: #000; opacity: 0; }
+  #blackout { position: fixed; inset: 0; background: #000; z-index: 50; pointer-events: none; }
+
+  .ui { position: fixed; z-index: 20; }
+
+  #brand { top: 4.5vh; right: 4vw; text-align: right; }
+  #brand h1 { display: flex; align-items: center; justify-content: flex-end; gap: .12em;
+    font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: clamp(24px, 3.6vw, 54px); line-height: 1;
+    letter-spacing: .32em; color: var(--bone); text-shadow: 0 0 30px rgba(127,199,150,.18); }
+  #brand h1 span:last-child { margin-right: -.32em; }
+  #egg { height: 2.4em; width: auto; overflow: visible; margin: -.6em .1em -.25em -.05em; cursor: pointer;
+    filter: drop-shadow(0 0 14px rgba(127,199,150,.18)); }
+  #brand p { margin-top: 16px; font-size: 14px; letter-spacing: .32em; color: var(--bone-dim); text-transform: uppercase; }
+
+  /* ---- monitor housing ---- */
+  #term { top: calc(4.5vh + clamp(24px, 3.6vw, 54px) * 2.2 + 50px); right: 4vw; width: min(430px, 42vw);
+    padding: 22px 18px 34px 54px; border-radius: 12px 12px 8px 8px;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+      linear-gradient(180deg, #6a6352 0%, #4a4538 18%, #36322a 70%, #24211b 100%);
+    box-shadow: 0 30px 60px rgba(0,0,0,.85), 0 0 0 1px #12100c,
+                inset 0 1px 0 rgba(255,240,200,.18), inset 0 -3px 6px rgba(0,0,0,.6); }
+  #term::before { content: ''; position: absolute; left: -6px; right: -6px; top: -14px; height: 22px;
+    border-radius: 6px 6px 2px 2px; background: linear-gradient(180deg, #77705d, #4b4639);
+    box-shadow: 0 6px 10px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,240,200,.2); }
+  #term::after { content: 'WEYLAND-YUTANI · MU/TH/UR 6000'; position: absolute; left: 54px; bottom: 11px;
+    font: 500 8px 'IBM Plex Mono', monospace; letter-spacing: .3em; color: #1a1814;
+    text-shadow: 0 1px 0 rgba(255,240,200,.14); }
+  .keys { position: absolute; left: 14px; top: 30px; display: flex; flex-direction: column; gap: 7px; }
+  .keys i { display: block; width: 26px; height: 16px; border-radius: 2px;
+    background: linear-gradient(#cfc6ad, #8f8771); box-shadow: 0 2px 0 #1b1914, inset 0 1px 0 rgba(255,255,255,.5); }
+  .keys i.on { background: linear-gradient(#fff2c4, #e0b65a); box-shadow: 0 2px 0 #1b1914, 0 0 10px rgba(255,200,90,.6); }
+  /* rotary volume knob below the keys */
+  .knob { position: absolute; left: 13px; top: 118px; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+    background: radial-gradient(circle at 35% 30%, #d8cfb8, #6b6350 55%, #36322a 100%);
+    box-shadow: 0 2px 0 #1b1914, inset 0 1px 0 rgba(255,255,255,.4), 0 0 0 4px #2b2820, 0 0 9px rgba(255,205,95,.35); }
+  .knob i { position: absolute; left: 50%; top: 3px; width: 2.5px; height: 9px; margin-left: -1.25px;
+    background: #241d10; border-radius: 1.5px; transform-origin: 50% 11px; transform: rotate(38deg); transition: transform .3s; }
+  .knob b { position: absolute; left: 50%; top: 31px; transform: translateX(-50%); font: 500 7px 'IBM Plex Mono', monospace;
+    letter-spacing: .12em; color: #1a1814; text-shadow: 0 1px 0 rgba(255,240,200,.14); }
+  .knob.off { box-shadow: 0 2px 0 #1b1914, inset 0 1px 0 rgba(255,255,255,.4), 0 0 0 4px #2b2820; }
+  .knob.off i { transform: rotate(-130deg); }
+
+  /* ---- CRT screen ---- */
+  .screen { position: relative; padding: 14px 16px 12px; border-radius: 16px / 12px; overflow: hidden;
+    font-size: 11px; line-height: 1.7; letter-spacing: .06em; font-weight: 500; color: #082408;
+    background: radial-gradient(ellipse at 50% 45%, #8ef07a 0%, #4fc946 55%, #1f6e1e 100%);
+    box-shadow: 0 0 0 6px #0b0c09, 0 0 0 8px #3a362c,
+                inset 0 0 30px rgba(0,40,0,.7), 0 0 40px rgba(110,230,100,.25);
+    text-shadow: 0 0 2px rgba(8,36,8,.45); animation: crtFlicker 5s infinite; }
+  .screen::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0,30,0,.22) 0 1px, transparent 1px 3px); }
+  .screen::after { content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+    background: radial-gradient(ellipse 80% 50% at 30% 8%, rgba(255,255,255,.22), transparent 60%); }
+  @keyframes crtFlicker { 0%, 46%, 50%, 100% { filter: brightness(1); } 47% { filter: brightness(.82); } 48% { filter: brightness(1.06); } }
+
+  #term .hd { display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 6px;
+    border-bottom: 2px solid rgba(8,36,8,.55); font-weight: 600; }
+  #log { height: calc(1.7em * 7); overflow: hidden; }
+  #log div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #log div::before { content: '> '; opacity: .6; }
+  #log div.warn { background: #082408; color: #8ef07a; text-shadow: 0 0 4px rgba(142,240,122,.6); padding: 0 4px; }
+  #log div.warn .cursor { background: #8ef07a; }
+  #log .cursor { margin-left: 3px; }
+  .cursor { display: inline-block; width: 7px; height: 11px; background: #082408; vertical-align: -1px;
+    animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  #panel { left: 4vw; bottom: 5vh; display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; align-items: center; gap: 8px; }
+  .row > span { font-family: 'Unbounded', sans-serif; font-weight: 300; font-size: 9px; letter-spacing: .3em;
+    color: var(--bone-dim); width: 96px; }
+  .opt { font-family: 'Unbounded', sans-serif; font-weight: 300; font-size: 9px; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--bone-dim); background: rgba(3,8,5,.55); border: 1px solid #1d2c22;
+    padding: 9px 12px 8px; cursor: pointer; transition: .25s; }
+  .opt:hover { color: var(--bone); border-color: #34503d; }
+  .opt.on { color: var(--bone); border-color: var(--accent); box-shadow: inset 0 0 14px rgba(127,199,150,.14); }
+  .sw { width: 8px; height: 8px; display: inline-block; margin-right: 8px; border-radius: 50%; }
+
+  #actions { right: 4vw; bottom: 5vh; display: flex; gap: 10px; }
+  .btn { font-family: 'Unbounded', sans-serif; font-weight: 300; font-size: 11px; letter-spacing: .38em;
+    text-transform: uppercase; padding: 18px 30px 17px 34px; cursor: pointer; color: var(--bone);
+    background: rgba(3,8,5,.6); border: 1px solid #23362a; transition: .3s; }
+  .btn:hover { border-color: var(--accent); color: #e4efe2; box-shadow: 0 0 30px rgba(127,199,150,.2); }
+  .btn.ghost { color: var(--bone-dim); padding: 18px 20px 17px 24px; }
+</style>
+</head>
+<body>
+
+<!-- ===== BACKGROUND: derelict ship corridor ===== -->
+<img id="bg" src="bg.png" alt="">
+<div id="bgShade" class="layer"></div>
+
+<div id="pulse"></div>
+<div class="fog"></div>
+<div class="fog b"></div>
+
+<div id="shake">
+  <!-- ===== WORLD: desk, document, imprints ===== -->
+  <svg id="world" class="layer" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <defs id="wdefs">
+      <linearGradient id="deskG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#121a15"/>
+        <stop offset="100%" stop-color="#030504"/>
+      </linearGradient>
+      <linearGradient id="paperG" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#d3c7ae"/>
+        <stop offset="100%" stop-color="#a39478"/>
+      </linearGradient>
+      <radialGradient id="poolG" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#bfe8cc" stop-opacity=".2"/>
+        <stop offset="100%" stop-color="#bfe8cc" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="coneG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#c8f0d4" stop-opacity=".12"/>
+        <stop offset="100%" stop-color="#c8f0d4" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="edgeF" x="-30%" y="-30%" width="160%" height="160%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="3" seed="11" result="e"/>
+        <feDisplacementMap in="SourceGraphic" in2="e" scale="16"/>
+      </filter>
+    </defs>
+
+    <polygon points="0,800 1200,800 1200,385 0,420" fill="url(#deskG)"/>
+    <path d="M0 420 L1200 385" stroke="#2f4a38" stroke-width="1.5"/>
+    <ellipse cx="720" cy="600" rx="430" ry="160" fill="url(#poolG)"/>
+
+    <g id="paperWrap">
+      <g id="paper" transform="translate(720 600) scale(1 .5) rotate(-9)">
+        <rect x="-214" y="-284" width="428" height="568" fill="#000" opacity=".55" transform="translate(12 18)"/>
+        <rect id="sheet" x="-210" y="-280" width="420" height="560" fill="url(#paperG)"/>
+        <text x="-180" y="-228" font-family="Unbounded" font-weight="500" font-size="15" letter-spacing="3" fill="#5e5241">ДОГОВОР № 0426</text>
+        <text x="-180" y="-208" font-family="IBM Plex Mono" font-size="9" fill="#7a6d58">г. Санкт-Петербург · 15.10.2026</text>
+        <g id="lines" fill="#8a7c65"></g>
+        <text x="-180" y="122" font-family="IBM Plex Mono" font-size="9" fill="#6f6350">ИСПОЛНИТЕЛЬ</text>
+        <text x="40" y="122" font-family="IBM Plex Mono" font-size="9" fill="#6f6350">ЗАКАЗЧИК</text>
+        <path d="M-180 150 H-40 M40 150 H180" stroke="#7a6d58" stroke-width="1"/>
+        <g id="mp" opacity=".6">
+          <circle cx="-110" cy="205" r="56" fill="none" stroke="#8a7d66" stroke-width="1" stroke-dasharray="4 5"/>
+          <text x="-110" y="209" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#8a7d66">М.П.</text>
+        </g>
+        <g id="prints"></g>
+        <g id="splats"></g>
+      </g>
+    </g>
+
+    <radialGradient id="shadowG"><stop offset="0%" stop-color="#000" stop-opacity=".85"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
+    <ellipse id="tipShadow" rx="60" ry="22" fill="url(#shadowG)" opacity="0" pointer-events="none"/>
+
+    <polygon id="cone" points="650,-10 800,-10 1060,800 380,800" fill="url(#coneG)" style="mix-blend-mode:screen"/>
+  </svg>
+
+  <!-- ===== FOREGROUND: the creature ===== -->
+  <svg id="fg" class="layer" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="domeG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3f5254" stop-opacity=".93"/>
+        <stop offset="40%" stop-color="#132022" stop-opacity=".84"/>
+        <stop offset="100%" stop-color="#040808" stop-opacity=".74"/>
+      </linearGradient>
+      <linearGradient id="specG" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#fff" stop-opacity="0"/>
+        <stop offset="55%" stop-color="#e2f8f3" stop-opacity=".9"/>
+        <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="rimG" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#8fd6cc" stop-opacity="0"/>
+        <stop offset="65%" stop-color="#8fd6cc" stop-opacity=".5"/>
+        <stop offset="100%" stop-color="#c4f4ec" stop-opacity=".9"/>
+      </linearGradient>
+      <linearGradient id="skullG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#2e3a38"/>
+        <stop offset="100%" stop-color="#080c0b"/>
+      </linearGradient>
+      <linearGradient id="jawG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#1f2b2a"/>
+        <stop offset="100%" stop-color="#050808"/>
+      </linearGradient>
+      <linearGradient id="boneG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#c9d3ce"/>
+        <stop offset="100%" stop-color="#55615c"/>
+      </linearGradient>
+      <linearGradient id="toothG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f6f9f7"/>
+        <stop offset="55%" stop-color="#a9b6b2"/>
+        <stop offset="100%" stop-color="#4a5452"/>
+      </linearGradient>
+      <radialGradient id="flashG" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#e6f6ee" stop-opacity=".6"/>
+        <stop offset="100%" stop-color="#e6f6ee" stop-opacity="0"/>
+      </radialGradient>
+      <!-- wet chitin highlights: baked once from an SVG lighting filter (see wetTexture) -->
+      <pattern id="wetP" patternUnits="userSpaceOnUse" width="512" height="256" patternTransform="scale(.55)">
+        <image id="wetImg" width="512" height="256"/>
+      </pattern>
+      <path id="domePath" d="M 234 -6 C 200 -34, 120 -60, 20 -78 C -80 -96, -190 -106, -252 -90
+                            C -280 -82, -274 -60, -242 -48 C -180 -36, -100 -30, -20 -24 C 80 -16, 170 -10, 234 -6 Z"/>
+      <path id="skullPath" d="M 242 -8 C 180 -22, 80 -32, -40 -38 C -110 -42, -170 -46, -200 -48
+                             L -160 -6 C -100 2, -20 8, 40 10 L 242 4 Z"/>
+      <clipPath id="domeClip"><use href="#domePath"/></clipPath>
+      <clipPath id="skullClip"><use href="#skullPath"/></clipPath>
+      <clipPath id="mouthClip" clipPathUnits="userSpaceOnUse"><path id="mouthClipPath"/></clipPath>
+    </defs>
+
+    <g id="creature">
+      <g id="neck"></g>
+      <g id="headAim">
+        <!-- cheek hoses running back from the jaw hinge -->
+        <g id="hoses" fill="none" stroke-linecap="round">
+          <path d="M 40 12 C 0 10, -60 2, -140 -16" stroke="#0a1010" stroke-width="9"/>
+          <path d="M 40 12 C 0 10, -60 2, -140 -16" stroke="#3b5450" stroke-width="1" opacity=".6" transform="translate(0 -3.5)"/>
+          <path d="M 64 26 C 20 30, -40 24, -130 4" stroke="#050808" stroke-width="16"/>
+          <path d="M 64 26 C 20 30, -40 24, -130 4" stroke="#3a5652" stroke-width="1.4" opacity=".75" transform="translate(0 -6)"/>
+          <path d="M 58 36 C 10 46, -50 44, -120 30" stroke="#070b0b" stroke-width="11"/>
+          <path d="M 58 36 C 10 46, -50 44, -120 30" stroke="#34504c" stroke-width="1" opacity=".65" transform="translate(0 -4)"/>
+        </g>
+        <g id="inner" clip-path="url(#mouthClip)">
+          <path id="tube" fill="#1b2423" stroke="#070b0b" stroke-width="1"/>
+          <g id="tubeRibs"></g>
+          <path id="sinew1" fill="none" stroke="#5a1f1a" stroke-width="1.6"/>
+          <path id="sinew2" fill="none" stroke="#5a1f1a" stroke-width="1.1" opacity=".8"/>
+          <g id="tip">
+            <g id="tipSquash">
+              <path d="M -34 -12 C -18 -18, -2 -16, 4 -9 L 4 9 C -2 16, -18 18, -34 12 Z" fill="url(#boneG)" stroke="#141b1a" stroke-width="1"/>
+              <rect x="3" y="-17" width="6" height="34" rx="2" fill="#141b1a"/>
+              <ellipse id="disc" cx="9" cy="0" rx="3" ry="22" fill="#8c1a12" stroke="#0a0606" stroke-width="1"/>
+              <g id="miniU">
+                <path d="M -24 -9 C -12 -24, 8 -28, 17 -16 L 17 0 L -24 -2 Z" fill="url(#boneG)" stroke="#141b1a" stroke-width="1"/>
+                <path d="M -6 0 L -3 4 L 0 0 M 3 0 L 6 4 L 9 0 M 12 0 L 14 3 L 16 0" fill="#eef3f1" stroke="#141b1a" stroke-width=".5"/>
+              </g>
+              <g id="miniL">
+                <path d="M -24 9 C -12 24, 8 28, 17 16 L 17 0 L -24 2 Z" fill="url(#boneG)" stroke="#141b1a" stroke-width="1"/>
+                <path d="M -4 0 L -1 -4 L 2 0 M 5 0 L 8 -4 L 11 0" fill="#eef3f1" stroke="#141b1a" stroke-width=".5"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g id="lowerJaw">
+          <path id="lowerJawPlate" d="M 50 16 C 120 19, 196 19, 238 17 C 246 21, 242 31, 230 35 C 170 44, 100 46, 58 36 C 46 30, 44 22, 50 16 Z"
+                fill="url(#jawG)" stroke="#33413f" stroke-width="1"/>
+          <use href="#lowerJawPlate" fill="url(#wetP)" stroke="none" opacity=".35"/>
+          <g id="lowerLip" stroke="#3d4f4b" stroke-width="1.1" stroke-linecap="round"></g>
+          <path d="M 70 30 C 120 36, 170 34, 215 28 M 80 38 C 120 42, 160 41, 200 36" fill="none" stroke="#283432" stroke-width="1.2"/>
+          <path d="M 62 38 C 100 47, 170 45, 232 35" fill="none" stroke="url(#rimG)" stroke-width="1.3"/>
+          <g id="lowerTeeth"></g>
+        </g>
+        <!-- ribbed skull under the translucent dome -->
+        <use href="#skullPath" fill="url(#skullG)" stroke="#2c3836" stroke-width="1"/>
+        <g id="skullRibs" clip-path="url(#skullClip)" fill="none" stroke-linecap="round"></g>
+        <use href="#skullPath" fill="url(#wetP)" opacity=".3"/>
+        <g id="domeRibs" clip-path="url(#domeClip)" fill="none" stroke="#4a5e5b" stroke-width="5" opacity=".55"></g>
+        <use href="#domePath" fill="url(#domeG)"/>
+        <use href="#domePath" fill="url(#wetP)" opacity=".4"/>
+        <use href="#domePath" fill="none" stroke="#5f7b76" stroke-width="1" stroke-opacity=".55"/>
+        <path id="upperJawPlate" d="M 40 6 C 110 2, 190 -2, 246 -4 C 254 2, 251 10, 242 13 L 40 18 Z" fill="url(#jawG)" stroke="#33413f" stroke-width="1"/>
+        <use href="#upperJawPlate" fill="url(#wetP)" stroke="none" opacity=".35"/>
+        <g id="upperLip" stroke="#3d4f4b" stroke-width="1.1" stroke-linecap="round"></g>
+        <path d="M 70 4 C 140 -1, 200 -4, 246 -4" fill="none" stroke="url(#rimG)" stroke-width="1.4"/>
+        <g id="upperTeeth"></g>
+        <!-- speculars + cold rim light from the tunnel -->
+        <path d="M 222 -14 C 180 -36, 110 -56, 20 -73 C -80 -90, -180 -100, -240 -88" fill="none" stroke="url(#specG)" stroke-width="12" opacity=".13"/>
+        <path d="M 222 -14 C 180 -36, 110 -56, 20 -73 C -80 -90, -180 -100, -240 -88" fill="none" stroke="url(#specG)" stroke-width="2.2" opacity=".85"/>
+        <path d="M 234 -6 C 200 -34, 120 -60, 20 -78" fill="none" stroke="url(#rimG)" stroke-width="2"/>
+      </g>
+    </g>
+
+    <g id="fx"></g>
+    <circle id="flash" r="120" fill="url(#flashG)" opacity="0"/>
+  </svg>
+</div>
+
+<div id="scan"></div>
+<div id="vignette"></div>
+<div id="dim"></div>
+
+<div class="ui" id="term">
+  <div class="keys"><i class="on"></i><i></i><i></i></div>
+  <div class="knob" id="keySnd" title="Звук (M)"><i></i><b>SND</b></div>
+  <div class="screen">
+    <div class="hd"><span>MU/TH/UR 6000</span><span id="count">ОТТИСКОВ: 000</span></div>
+    <div id="log"></div>
+    <span class="cursor"></span>
+  </div>
+</div>
+
+<div class="ui" id="brand">
+  <h1><span>ALIEN</span>
+    <svg id="egg" viewBox="0 0 120 150" aria-hidden="true">
+      <defs>
+        <radialGradient id="eShell" cx="38%" cy="42%" r="70%">
+          <stop offset="0%" stop-color="#5f6347"/>
+          <stop offset="45%" stop-color="#2c3020"/>
+          <stop offset="100%" stop-color="#0b0d08"/>
+        </radialGradient>
+        <radialGradient id="eVoidG" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#c8ef86"/>
+          <stop offset="40%" stop-color="#4d6a22"/>
+          <stop offset="100%" stop-color="#050704"/>
+        </radialGradient>
+        <linearGradient id="eHug" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#e6d8b0"/>
+          <stop offset="100%" stop-color="#9a8a60"/>
+        </linearGradient>
+        <clipPath id="eBodyClip">
+          <path d="M -20 -60 H 140 V 42 H -20 Z M 35 42 A 25 8 0 0 0 85 42 A 25 8 0 0 0 35 42 Z"/>
+        </clipPath>
+      </defs>
+      <ellipse cx="60" cy="143" rx="42" ry="5" fill="#000" opacity=".55"/>
+      <g fill="none" stroke="#1e2216" stroke-width="3" stroke-linecap="round">
+        <path d="M 38 134 C 30 140, 20 142, 10 146"/>
+        <path d="M 82 134 C 92 140, 102 141, 112 146"/>
+        <path d="M 55 140 C 52 145, 46 148, 40 150"/>
+      </g>
+      <path id="eBack" d="M 44 42 C 46 28, 54 12, 60 10 C 66 12, 74 28, 76 42 Z" fill="url(#eShell)" stroke="#0d0f09" stroke-width="1"/>
+      <path d="M 33 42 C 18 60, 14 90, 18 108 C 23 128, 40 140, 60 140 C 80 140, 97 128, 102 108 C 106 90, 102 60, 87 42 C 78 47, 42 47, 33 42 Z"
+            fill="url(#eShell)" stroke="#0d0f09" stroke-width="1.2"/>
+      <g fill="none" stroke="#7d8160" stroke-width=".9" opacity=".35" stroke-linecap="round">
+        <path d="M 30 62 C 26 80, 28 100, 36 118"/>
+        <path d="M 46 52 C 40 74, 44 104, 52 128"/>
+        <path d="M 74 52 C 80 70, 78 96, 70 126"/>
+        <path d="M 90 60 C 96 78, 94 100, 86 118"/>
+        <path d="M 30 90 C 40 94, 50 92, 58 98 M 64 84 C 74 88, 84 86, 92 90"/>
+      </g>
+      <ellipse id="eVoid" cx="60" cy="42" rx="25" ry="8" fill="url(#eVoidG)"/>
+      <g clip-path="url(#eBodyClip)">
+        <g id="eHugger">
+          <path id="eTail" fill="none" stroke="#b9a87c" stroke-width="2.4" stroke-linecap="round"/>
+          <ellipse id="eHugBody" cx="60" cy="40" rx="13" ry="6" fill="url(#eHug)" stroke="#4a3f28" stroke-width="1"/>
+          <path id="eHugRibs" fill="none" stroke="#6f6040" stroke-width=".8"/>
+        </g>
+      </g>
+      <path id="eL" d="M 33 42 C 34 30, 46 20, 60 19 L 52 42 Z" fill="url(#eShell)" stroke="#0d0f09" stroke-width="1"/>
+      <path id="eR" d="M 87 42 C 86 30, 74 20, 60 19 L 68 42 Z" fill="url(#eShell)" stroke="#0d0f09" stroke-width="1"/>
+      <g id="eLegs" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+      <path id="eF" d="M 45 43 L 60 19 L 75 43 C 69 47, 51 47, 45 43 Z" fill="url(#eShell)" stroke="#0d0f09" stroke-width="1"/>
+    </svg>
+    <span>ШТАМП</span></h1>
+  <p>Изготовление печатей и штампов</p>
+</div>
+
+<div class="ui" id="panel">
+  <div class="row"><span>ФОРМА</span>
+    <button class="opt on" data-type="round">Круглая</button>
+    <button class="opt" data-type="rect">Штамп</button>
+    <button class="opt" data-type="tri">Треуг.</button>
+  </div>
+  <div class="row"><span>ЧЕРНИЛА</span>
+    <button class="opt on" data-ink="blood"><i class="sw" style="background:#8c1a12"></i>Кровь</button>
+    <button class="opt" data-ink="blue"><i class="sw" style="background:#2b3a95"></i>Синие</button>
+    <button class="opt" data-ink="acid"><i class="sw" style="background:#9cbf2a"></i>Кислота</button>
+  </div>
+</div>
+
+<div class="ui" id="actions">
+  <button class="btn ghost" id="clearBtn">Очистить</button>
+  <button class="btn" id="stampBtn">Поставить печать</button>
+</div>
+
+<div id="blackout"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const $ = s => document.querySelector(s);
+const el = (tag, attrs, parent) => {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  parent && parent.appendChild(n);
+  return n;
+};
+const rand = gsap.utils.random;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+gsap.defaults({ overwrite: 'auto' });
+
+const INKS = { blood: '#8c1a12', blue: '#2b3a95', acid: '#93b52a' };
+const TYPES = { round: 'КРУГЛАЯ ПЕЧАТЬ', rect: 'ШТАМП', tri: 'ТРЕУГОЛЬНАЯ ПЕЧАТЬ' };
+let curType = 'round', curInk = 'blood';
+
+const PIV = { x: 300, y: 185 };   // neck pivot of the head, world coords
+const AX_Y = 24;                  // inner jaw axis offset in head space
+const TIP_REST = 20;              // inner jaw tip x at rest (deep in the throat, behind the jaw hinge)
+const DISC_FRONT = 12;            // stamp face offset from tip origin
+const LUNGE = 10;                 // head lunge at impact
+const MP = { x: -110, y: 205 };   // "М.П." spot on the paper
+
+const worldSvg = $('#world'), paperG = $('#paper'), wdefs = $('#wdefs');
+
+/* ---------- seeded rng for stable static art ---------- */
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* ---------- document text lines ---------- */
+(() => {
+  const r = mulberry(42), g = $('#lines');
+  let y = -180;
+  for (let p = 0; p < 5; p++) {
+    const rows = 3 + Math.floor(r() * 3);
+    for (let i = 0; i < rows; i++, y += 12) {
+      const w = i === rows - 1 ? 120 + r() * 160 : 330 + r() * 30;
+      el('rect', { x: -180 + (i === 0 ? 18 : 0), y, width: w - (i === 0 ? 18 : 0), height: 4, opacity: .55 + r() * .25 }, g);
+    }
+    y += 10;
+  }
+})();
+
+/* ---------- ink filters (several seeds -> every imprint differs) ---------- */
+const INK_FILTERS = 4;
+for (let i = 0; i < INK_FILTERS; i++) {
+  const f = el('filter', { id: `inkF${i}`, x: '-25%', y: '-25%', width: '150%', height: '150%' }, wdefs);
+  el('feTurbulence', { type: 'fractalNoise', baseFrequency: '1.1', numOctaves: 2, seed: 3 + i * 17, result: 'e' }, f);
+  el('feDisplacementMap', { in: 'SourceGraphic', in2: 'e', scale: 3.4, xChannelSelector: 'R', yChannelSelector: 'G', result: 'd' }, f);
+  el('feTurbulence', { type: 'fractalNoise', baseFrequency: '0.09', numOctaves: 4, seed: 9 + i * 31, result: 't' }, f);
+  el('feColorMatrix', { in: 't', type: 'matrix', values: '0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 2.4 -0.7', result: 'ta' }, f);
+  el('feComposite', { in: 'd', in2: 'ta', operator: 'in', result: 'c' }, f);
+  el('feGaussianBlur', { in: 'c', stdDeviation: .35 }, f);
+}
+
+/* ---------- neck: spine with dorsal spikes and hoses ---------- */
+(() => {
+  const g = $('#neck');
+  const A = { x: -100, y: -140 }, C = { x: 130, y: 55 }, B = { x: PIV.x - 8, y: PIV.y + 6 };
+  const q = t => ({ x: (1-t)**2*A.x + 2*(1-t)*t*C.x + t*t*B.x, y: (1-t)**2*A.y + 2*(1-t)*t*C.y + t*t*B.y });
+  const dq = t => ({ x: 2*(1-t)*(C.x-A.x) + 2*t*(B.x-C.x), y: 2*(1-t)*(C.y-A.y) + 2*t*(B.y-C.y) });
+  const off = (dx, dy) => `M ${A.x+dx} ${A.y+dy} Q ${C.x+dx} ${C.y+dy} ${B.x+dx*.4} ${B.y+dy*.4}`;
+  el('path', { d: off(18, 22), stroke: '#050808', 'stroke-width': 12, fill: 'none', 'stroke-linecap': 'round' }, g);
+  el('path', { d: off(18, 18), stroke: '#3a5652', 'stroke-width': 1, fill: 'none', opacity: .6 }, g);
+  el('path', { d: off(0, 0), stroke: '#060a0a', 'stroke-width': 36, fill: 'none', 'stroke-linecap': 'round' }, g);
+  el('path', { d: off(-6, -12), stroke: '#2b3c3a', 'stroke-width': 1.5, fill: 'none', opacity: .7 }, g);
+  for (let i = 0; i <= 22; i++) {
+    const t = i / 22, p = q(t), d = dq(t);
+    const a = Math.atan2(d.y, d.x) * 180 / Math.PI, s = 1 + (1 - t) * .35;
+    const v = el('g', { transform: `translate(${p.x} ${p.y}) rotate(${a}) scale(${s})` }, g);
+    el('path', { d: 'M -3 -15 C -14 -26, -20 -38, -30 -44 C -16 -38, -6 -28, 4 -15 Z',
+      fill: '#0a100f', stroke: '#1f2a28', 'stroke-width': .9 }, v);
+    el('ellipse', { cx: 0, cy: 0, rx: 5, ry: 18, fill: '#0f1615', stroke: '#222e2c', 'stroke-width': 1 }, v);
+    el('path', { d: 'M -2 -14 Q 1 0 -2 14', fill: 'none', stroke: '#6f8a85', 'stroke-width': .6, opacity: .3 }, v);
+  }
+})();
+
+/* ---------- teeth, lips, skull & dome ribs, tube ribs ---------- */
+(() => {
+  const up = $('#upperTeeth'), lo = $('#lowerTeeth');
+  for (let i = 0; i < 14; i++) {
+    const x = 112 + i * 9.4, y = 13 - (x - 110) / 130 * 3, len = 8 + (Math.sin(i * 2.3) + 1) * 2.6;
+    el('path', { d: `M${x-3.4} ${y} L${x+3.4} ${y} L${x+.8} ${y+len} Z`, fill: 'url(#toothG)', stroke: '#1a2120', 'stroke-width': .6 }, up);
+    el('path', { d: `M${x-1.6} ${y+1} L${x+.2} ${y+len*.8}`, stroke: '#fff', 'stroke-width': .6, opacity: .7 }, up);
+  }
+  for (let i = 0; i < 13; i++) {
+    const x = 116 + i * 9.2, y = 18.5, len = 7 + (Math.cos(i * 1.9) + 1) * 2.2;
+    el('path', { d: `M${x-3.2} ${y} L${x+3.2} ${y} L${x-.6} ${y-len} Z`, fill: 'url(#toothG)', stroke: '#1a2120', 'stroke-width': .6 }, lo);
+  }
+  // striated lips (pulled back membranes, very Alien)
+  const r = mulberry(7);
+  for (let x = 60; x <= 236; x += 6 + r() * 5) {
+    const yb = 18 - (x - 40) * 5 / 202, len = 4 + r() * 5;
+    el('path', { d: `M ${x} ${yb - 1.5 - len} Q ${x + 1.5} ${yb - 1.5 - len / 2} ${x + .5} ${yb - 1.5}`, fill: 'none', opacity: .5 + r() * .4 }, $('#upperLip'));
+  }
+  for (let x = 64; x <= 232; x += 6 + r() * 5) {
+    const len = 4 + r() * 4;
+    el('path', { d: `M ${x + 1} 20 Q ${x + 2.5} ${20 + len / 2} ${x} ${20 + len}`, fill: 'none', opacity: .5 + r() * .4 }, $('#lowerLip'));
+  }
+  // bony lattice of the skull: irregular organic ribs + a cheekbone ridge
+  const sk = $('#skullRibs');
+  for (let x = -170; x <= 236; x += 9 + r() * 7) {
+    const top = -34 - r() * 10, bend = 3 + r() * 8, w = 1.6 + r() * 1.6;
+    const d = `M ${x} ${top} C ${x + bend} ${top + 16}, ${x + bend * .3} ${-2}, ${x + bend * .6} 14`;
+    el('path', { d, stroke: '#0a0f0e', 'stroke-width': w + 1 }, sk);
+    el('path', { d, stroke: '#869a94', 'stroke-width': .5, opacity: .1 + r() * .15, transform: 'translate(-1.2 0)' }, sk);
+  }
+  el('path', { d: 'M -170 -14 C -90 -8, 10 -4, 140 -8', stroke: '#050807', 'stroke-width': 4 }, sk);
+  el('path', { d: 'M -170 -17 C -90 -11, 10 -7, 140 -11', stroke: '#7d938d', 'stroke-width': .8, opacity: .5 }, sk);
+  const ribs = $('#domeRibs');
+  for (let i = 0; i < 13; i++) {
+    const x = -240 + i * 36;
+    el('path', { d: `M ${x} 10 Q ${x + 12} -40 ${x + 44} -100` }, ribs);
+  }
+})();
+const tubeRibs = Array.from({ length: 22 }, () =>
+  el('ellipse', { rx: 3.4, fill: '#56635e', stroke: '#a9b8b2', 'stroke-width': 1 }, $('#tubeRibs')));
+
+/* ---------- wet chitin texture: render an SVG lighting filter once, reuse as a bitmap pattern ---------- */
+(() => {
+  const src = `<svg xmlns='http://www.w3.org/2000/svg' width='512' height='256'><filter id='f' x='0' y='0' width='100%' height='100%'>` +
+    `<feTurbulence type='fractalNoise' baseFrequency='0.006 0.03' numOctaves='3' seed='7'/>` +
+    `<feSpecularLighting surfaceScale='6' specularConstant='1' specularExponent='30' lighting-color='#d2f2ea'>` +
+    `<feDistantLight azimuth='235' elevation='42'/></feSpecularLighting></filter>` +
+    `<rect width='100%' height='100%' filter='url(#f)'/></svg>`;
+  const url = 'data:image/svg+xml,' + encodeURIComponent(src), img = new Image();
+  img.onload = () => {
+    try {
+      const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+      c.getContext('2d').drawImage(img, 0, 0);
+      $('#wetImg').setAttribute('href', c.toDataURL());
+    } catch (e) { $('#wetImg').setAttribute('href', url); }
+  };
+  img.src = url;
+})();
+
+/* ---------- creature state + render loop ---------- */
+const S = { angle: 36, look: 36, ext: 0, jaw: 0, mini: 0, bob: 0, grind: 0, shadow: 0, locked: false };
+const shadowAt = { x: 0, y: 0 }, tipShadow = $('#tipShadow');
+const cur = { ang: 36, back: 0 };
+const headAim = $('#headAim'), lowerJaw = $('#lowerJaw'), mouthClip = $('#mouthClipPath'),
+      tube = $('#tube'), tip = $('#tip'), miniU = $('#miniU'), miniL = $('#miniL'),
+      sinew1 = $('#sinew1'), sinew2 = $('#sinew2');
+
+function rotHinge(x, y, deg) {
+  const a = deg * Math.PI / 180, dx = x - 55, dy = y - 18;
+  return { x: 55 + dx * Math.cos(a) - dy * Math.sin(a), y: 18 + dx * Math.sin(a) + dy * Math.cos(a) };
+}
+function headToWorld(x, y) {
+  const a = cur.ang * Math.PI / 180, lx = x + cur.back;
+  const ox = gsap.getProperty('#creature', 'x'), oy = gsap.getProperty('#creature', 'y');
+  return { x: PIV.x + ox + lx * Math.cos(a) - y * Math.sin(a), y: PIV.y + oy + lx * Math.sin(a) + y * Math.cos(a) };
+}
+
+function render() {
+  const t = performance.now() / 1000;
+  if (!S.locked) S.angle += (S.look - S.angle) * 0.045;
+  const ang = S.angle + (S.locked ? 0 : Math.sin(t * 1.1) * 1.4);
+  const back = S.bob + (S.locked ? 0 : Math.sin(t * 1.1 + 1) * 3);
+  cur.ang = ang; cur.back = back;
+  headAim.setAttribute('transform', `translate(${PIV.x} ${PIV.y}) rotate(${ang.toFixed(3)}) translate(${back.toFixed(2)} 0)`);
+
+  lowerJaw.setAttribute('transform', `rotate(${S.jaw.toFixed(2)} 55 18)`);
+  // inner jaw is visible only inside the open mouth and in front of it
+  const lb = rotHinge(240, 30, S.jaw), l0 = rotHinge(58, 36, S.jaw);
+  mouthClip.setAttribute('d', `M 58 10 L 246 4 L 246 -400 L 1500 -400 L 1500 400 L ${lb.x.toFixed(1)} 400 ` +
+    `L ${lb.x.toFixed(1)} ${lb.y.toFixed(1)} L ${l0.x.toFixed(1)} ${l0.y.toFixed(1)} Z`);
+
+  // inner jaw: tube stretches, ribs spread like an accordion
+  const tipX = TIP_REST + S.ext, x0 = -80, x1 = Math.max(tipX - 26, x0 + 12);
+  const hw = x => 16 - 5 * (x - x0) / (x1 - x0);
+  tube.setAttribute('d', `M ${x0} ${AX_Y - 16} L ${x1} ${AX_Y - 11} L ${x1} ${AX_Y + 11} L ${x0} ${AX_Y + 16} Z`);
+  tubeRibs.forEach((r, i) => {
+    const x = x0 + (x1 - x0) * (i + .5) / tubeRibs.length;
+    r.setAttribute('cx', x.toFixed(1)); r.setAttribute('cy', AX_Y); r.setAttribute('ry', hw(x).toFixed(2));
+  });
+  let s1 = '', s2 = '';
+  for (let k = 0; k <= 11; k++) {
+    const x = x0 + (x1 - x0) * k / 11, w = Math.sin(k * 1.3 + t * 3) * 1.6;
+    s1 += `${k ? 'L' : 'M'}${x.toFixed(1)} ${(AX_Y - hw(x) * .55 + w).toFixed(1)}`;
+    s2 += `${k ? 'L' : 'M'}${x.toFixed(1)} ${(AX_Y + hw(x) * .5 - w).toFixed(1)}`;
+  }
+  sinew1.setAttribute('d', s1); sinew2.setAttribute('d', s2);
+  tip.setAttribute('transform', `translate(${tipX.toFixed(2)} ${AX_Y}) rotate(${(S.grind * 5).toFixed(2)})`);
+  miniU.setAttribute('transform', `rotate(${(-S.mini * 38).toFixed(2)} -22 -6)`);
+  miniL.setAttribute('transform', `rotate(${(S.mini * 38).toFixed(2)} -22 6)`);
+
+  // cast shadow on the paper: tightens and darkens as the tip closes in
+  const sh = S.shadow;
+  tipShadow.setAttribute('opacity', (sh * .6).toFixed(3));
+  tipShadow.setAttribute('cx', (shadowAt.x + 18 * (1 - sh)).toFixed(1));
+  tipShadow.setAttribute('cy', (shadowAt.y + 10 * (1 - sh)).toFixed(1));
+  tipShadow.setAttribute('rx', (34 + 60 * (1 - sh)).toFixed(1));
+  tipShadow.setAttribute('ry', (12 + 22 * (1 - sh)).toFixed(1));
+}
+gsap.ticker.add(render);
+
+/* ---------- pointer tracking ---------- */
+const pt = (x, y) => { const p = worldSvg.createSVGPoint(); p.x = x; p.y = y; return p; };
+const clientToWorld = (cx, cy) => pt(cx, cy).matrixTransform(worldSvg.getScreenCTM().inverse());
+const clientToPaper = (cx, cy) => pt(cx, cy).matrixTransform(paperG.getScreenCTM().inverse());
+const paperToWorld = l => pt(l.x, l.y).matrixTransform(paperG.getScreenCTM()).matrixTransform(worldSvg.getScreenCTM().inverse());
+const lookAt = w => S.look = gsap.utils.clamp(8, 72, Math.atan2(w.y - PIV.y, w.x - PIV.x) * 180 / Math.PI);
+/* background photo: place the tunnel's vanishing point into the free area of the scene */
+const bgImg = $('#bg'), BG_VP = { x: .70, y: .75 };
+function layoutBg() {
+  const ar = (bgImg.naturalWidth || 1024) / (bgImg.naturalHeight || 341);
+  const W = innerWidth, H = innerHeight, sx = .55 * W, sy = .38 * H;
+  // smallest size that still covers the screen above the desk edge (+ parallax margin)
+  const h = 1.06 * Math.max(sy / BG_VP.y, (.65 * H - sy) / (1 - BG_VP.y),
+    sx / (BG_VP.x * ar), (W - sx) / ((1 - BG_VP.x) * ar));
+  const w = h * ar;
+  Object.assign(bgImg.style, { width: `${w}px`, height: `${h}px`,
+    left: `${sx - BG_VP.x * w}px`, top: `${sy - BG_VP.y * h}px` });
+}
+bgImg.complete ? layoutBg() : bgImg.addEventListener('load', layoutBg);
+addEventListener('resize', layoutBg);
+
+const bgX = gsap.quickTo('#bg', 'x', { duration: 1.2, ease: 'power2.out' }),
+      bgY = gsap.quickTo('#bg', 'y', { duration: 1.2, ease: 'power2.out' });
+addEventListener('pointermove', e => {
+  lookAt(clientToWorld(e.clientX, e.clientY));
+  bgX((.5 - e.clientX / innerWidth) * 26);
+  bgY((.5 - e.clientY / innerHeight) * 16);
+});
+
+/* ---------- terminal log ---------- */
+const logEl = $('#log'), queue = [];
+const cursorEl = $('.cursor');
+let typing = false, printed = 0;
+function log(txt, cls) { queue.push([txt, cls]); if (!typing) nextLine(); }
+function nextLine() {
+  const it = queue.shift();
+  if (!it) { typing = false; return; }
+  typing = true;
+  const d = document.createElement('div'), txt = document.createTextNode('');
+  if (it[1]) d.className = it[1];
+  d.append(txt, cursorEl);
+  logEl.appendChild(d);
+  gsap.fromTo('.keys i:nth-child(2)', { filter: 'brightness(2.2)' }, { filter: 'brightness(1)', duration: .25 });
+  while (logEl.children.length > 7) logEl.firstChild.remove();
+  let i = 0;
+  const iv = setInterval(() => {
+    txt.data = it[0].slice(0, ++i);
+    if (i >= it[0].length) { clearInterval(iv); setTimeout(nextLine, 80); }
+  }, 16);
+}
+
+/* ---------- sound (WebAudio, unlocked by first gesture) ---------- */
+let AC = null;
+addEventListener('pointerdown', () => {
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  AC && AC.state === 'suspended' && !ambMuted && AC.resume();
+  if (AC) { AC.addEventListener('statechange', startAmbient); startAmbient(); }
+});
+function noise(dur) {
+  const b = AC.createBuffer(1, AC.sampleRate * dur, AC.sampleRate), c = b.getChannelData(0);
+  for (let i = 0; i < c.length; i++) c[i] = Math.random() * 2 - 1;
+  const s = AC.createBufferSource(); s.buffer = b; return s;
+}
+const sfx = {
+  ok: () => AC && AC.state === 'running',
+  hiss(d = .6) {
+    if (!this.ok()) return;
+    const t = AC.currentTime, n = noise(d), f = AC.createBiquadFilter(), g = AC.createGain();
+    f.type = 'bandpass'; f.Q.value = .9;
+    f.frequency.setValueAtTime(2400, t); f.frequency.linearRampToValueAtTime(4200, t + d);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.14, t + .08); g.gain.exponentialRampToValueAtTime(.001, t + d);
+    n.connect(f).connect(g).connect(AC.destination); n.start(t);
+  },
+  thud() {
+    if (!this.ok()) return;
+    const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
+    o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(34, t + .14);
+    g.gain.setValueAtTime(.55, t); g.gain.exponentialRampToValueAtTime(.001, t + .22);
+    o.connect(g).connect(AC.destination); o.start(t); o.stop(t + .25);
+    const n = noise(.14), f = AC.createBiquadFilter(), ng = AC.createGain();
+    f.type = 'lowpass'; f.frequency.setValueAtTime(1000, t); f.frequency.exponentialRampToValueAtTime(160, t + .14);
+    ng.gain.setValueAtTime(.35, t); ng.gain.exponentialRampToValueAtTime(.001, t + .14);
+    n.connect(f).connect(ng).connect(AC.destination); n.start(t);
+  },
+  snap() {
+    if (!this.ok()) return;
+    const t = AC.currentTime, n = noise(.05), f = AC.createBiquadFilter(), g = AC.createGain();
+    f.type = 'highpass'; f.frequency.value = 1400;
+    g.gain.setValueAtTime(.25, t); g.gain.exponentialRampToValueAtTime(.001, t + .05);
+    n.connect(f).connect(g).connect(AC.destination); n.start(t);
+  }
+};
+
+/* ---------- ambient music: seamless decoded loop ---------- */
+let musGain = null, musLoading = false, ambMuted = false;
+function startAmbient() {
+  if (musLoading || !AC || AC.state !== 'running') return;
+  musLoading = true;
+  fetch(`ambient.mp3?ts=${Date.now()}`, { cache: 'no-cache' }).then(r => r.arrayBuffer()).then(b => AC.decodeAudioData(b)).then(buf => {
+    const src = AC.createBufferSource(); src.buffer = buf; src.loop = true;
+    musGain = AC.createGain(); musGain.gain.value = 0;
+    src.connect(musGain).connect(AC.destination); src.start();
+    musGain.gain.linearRampToValueAtTime(.06, AC.currentTime + 8);
+  }).catch(() => {});
+}
+function toggleSound() {
+  ambMuted = !ambMuted;
+  if (AC) ambMuted ? AC.suspend() : AC.resume();   // kills every sound source, not just the drone
+  $('#keySnd').classList.toggle('off', ambMuted);
+  log(ambMuted ? 'ЗВУК ВЫКЛЮЧЕН' : 'ЗВУК ВКЛЮЧЁН');
+}
+$('#keySnd').addEventListener('click', toggleSound);
+addEventListener('keydown', e => { if (e.key.toLowerCase() === 'm' || e.key === 'ь') toggleSound(); });
+
+/* ---------- imprint shapes (paper-local, centered at 0,0) ---------- */
+function shapeRound(g, c, id) {
+  el('circle', { r: 56, 'stroke-width': 3.4 }, g);
+  el('circle', { r: 50.5, 'stroke-width': 1.1 }, g);
+  el('circle', { r: 33, 'stroke-width': 1.6 }, g);
+  el('path', { id: `arc${id}`, d: 'M 0 -42 a 42 42 0 1 1 -0.01 0', fill: 'none', stroke: 'none' }, g);
+  const tx = el('text', { 'font-family': 'Unbounded', 'font-weight': 500, 'font-size': 6.6, fill: c, stroke: 'none' }, g);
+  const tp = el('textPath', { href: `#arc${id}`, textLength: 256, lengthAdjust: 'spacing' }, tx);
+  tp.textContent = 'ALIEN ШТАМП • ИЗГОТОВЛЕНИЕ ПЕЧАТЕЙ •';
+  for (let k = 0; k < 7; k++) {
+    const a = k * Math.PI * 2 / 7;
+    const p = (r, o) => `${(r * Math.cos(a + o)).toFixed(2)} ${(r * Math.sin(a + o)).toFixed(2)}`;
+    el('path', { d: `M ${p(7, 0)} Q ${p(20, .55)} ${p(27, .2)}`, 'stroke-width': 2.4 }, g);
+  }
+  el('circle', { r: 4, fill: c, stroke: 'none' }, g);
+}
+function shapeRect(g, c) {
+  el('rect', { x: -70, y: -32, width: 140, height: 64, 'stroke-width': 3 }, g);
+  el('rect', { x: -65, y: -27, width: 130, height: 54, 'stroke-width': 1 }, g);
+  const t = (y, size, txt, len) => {
+    const n = el('text', { x: 0, y, 'text-anchor': 'middle', 'font-family': 'Unbounded', 'font-weight': 500,
+      'font-size': size, fill: c, stroke: 'none', ...(len ? { textLength: len, lengthAdjust: 'spacingAndGlyphs' } : {}) }, g);
+    n.textContent = txt;
+  };
+  t(-7, 11, 'УТВЕРЖДАЮ', 112);
+  el('path', { d: 'M -52 0 H 52', 'stroke-width': 1 }, g);
+  t(12, 7, 'ООО «НОСТРОМО»', 92);
+  t(22, 5.4, 'ГЕН. ДИРЕКТОР ________', 96);
+}
+function shapeTri(g, c) {
+  const tri = s => `M 0 ${-71.6 * s} L ${62 * s} ${35.8 * s} L ${-62 * s} ${35.8 * s} Z`;
+  el('path', { d: tri(1), 'stroke-width': 3.2, 'stroke-linejoin': 'round' }, g);
+  el('path', { d: tri(.84), 'stroke-width': 1.1, 'stroke-linejoin': 'round' }, g);
+  const t = (y, size, txt, len) => {
+    const n = el('text', { x: 0, y, 'text-anchor': 'middle', 'font-family': 'Unbounded', 'font-weight': 500,
+      'font-size': size, fill: c, stroke: 'none', textLength: len, lengthAdjust: 'spacingAndGlyphs' }, g);
+    n.textContent = txt;
+  };
+  t(0, 9, 'ДЛЯ', 26);
+  t(12, 6.6, 'ДОКУМЕНТОВ', 60);
+  t(25, 4.8, 'ВЕЙЛАНД-ЮТАНИ', 74);
+}
+const SHAPES = { round: shapeRound, rect: shapeRect, tri: shapeTri };
+
+let nPrints = 0;
+function placeImprint(P, type, color, instant) {
+  const id = ++nPrints;
+  $('#count').textContent = 'ОТТИСКОВ: ' + String(id).padStart(3, '0');
+  const m = el('mask', { id: `m${id}`, maskUnits: 'userSpaceOnUse', x: -170, y: -170, width: 340, height: 340 }, wdefs);
+  const mc = el('circle', { r: instant ? 100 : 0, fill: '#fff', filter: 'url(#edgeF)' }, m);
+  const g = el('g', { transform: `translate(${P.x} ${P.y}) rotate(${rand(-12, 12)})`, mask: `url(#m${id})`,
+    opacity: rand(.8, .95) }, $('#prints'));
+  const inner = el('g', { filter: `url(#inkF${id % INK_FILTERS})`, fill: 'none', stroke: color }, g);
+  SHAPES[type](inner, color, id);
+  if (!instant) gsap.to(mc, { attr: { r: 100 }, duration: .26, ease: 'power4.out' });
+}
+
+function splat(P, color) {
+  const g = $('#splats');
+  for (let i = 0; i < 20; i++) {
+    const a = Math.random() * Math.PI * 2, r0 = 50 + Math.random() * 10, d = 10 + Math.random() * 60;
+    const c = el('circle', { cx: P.x + Math.cos(a) * r0, cy: P.y + Math.sin(a) * r0, r: .7 + Math.random() * 2.8, fill: color }, g);
+    gsap.to(c, { attr: { cx: `+=${Math.cos(a) * d}`, cy: `+=${Math.sin(a) * d}` },
+      opacity: Math.random() < .35 ? .8 : 0, duration: rand(.4, .8), ease: 'power2.out' });
+  }
+}
+
+function drop(W) {
+  const d = el('ellipse', { cx: W.x, cy: W.y, rx: 1.6, ry: 2.4, fill: '#c8d0bc', opacity: .7 }, $('#fx'));
+  gsap.to(d, { attr: { cy: W.y + rand(140, 240), ry: 4 }, opacity: 0, duration: rand(.8, 1.2), ease: 'power2.in',
+    onComplete: () => d.remove() });
+}
+
+function acidSmoke(W) {
+  for (let i = 0; i < 9; i++) {
+    const c = el('circle', { cx: W.x + rand(-30, 30), cy: W.y + rand(-6, 6), r: 5, fill: '#b5d14a', opacity: .22 }, $('#fx'));
+    gsap.to(c, { attr: { cy: `-=${rand(50, 110)}`, cx: `+=${rand(-20, 20)}`, r: rand(16, 28) }, opacity: 0,
+      duration: rand(1.2, 2), delay: i * .06, ease: 'sine.out', onComplete: () => c.remove() });
+  }
+}
+
+/* ---------- impact ---------- */
+function impact(P, W, type, color) {
+  placeImprint(P, type, color);
+  splat(P, color);
+  sfx.thud();
+  gsap.set('#flash', { attr: { cx: W.x, cy: W.y } });
+  gsap.fromTo('#flash', { opacity: .55 }, { opacity: 0, duration: .4 });
+  gsap.fromTo('#shake', { x: -6, y: 3 }, { x: 6, y: -3, duration: .035, repeat: 5, yoyo: true, ease: 'none',
+    onComplete: () => gsap.set('#shake', { x: 0, y: 0 }) });
+  gsap.fromTo('#paperWrap', { y: 0 }, { y: 4, duration: .05, yoyo: true, repeat: 1 });
+  gsap.timeline().to('#cone', { opacity: .3, duration: .04 }).to('#cone', { opacity: 1, duration: .05 })
+    .to('#cone', { opacity: .5, duration: .04 }, '+=.06').to('#cone', { opacity: 1, duration: .2 });
+  if (!hatching) gsap.to(E, { open: .1, duration: .08, yoyo: true, repeat: 1 });
+  log(`${TYPES[type]} — ОТТИСК #${String(nPrints).padStart(3, '0')} НАНЕСЁН`);
+  if (color === INKS.acid) { acidSmoke(W); log('ВНИМАНИЕ: КИСЛОТНЫЕ ЧЕРНИЛА. БУМАГА ДЫМИТ', 'warn'); }
+}
+
+/* ---------- strike ---------- */
+let busy = false;
+function strike(P) {
+  if (busy) return;
+  const type = curType, color = INKS[curInk];
+  if (reduced) { placeImprint(P, type, color, true); return; }
+  busy = true; S.locked = true;
+
+  const W = paperToWorld(P);
+  const dx = W.x - PIV.x, dy = W.y - PIV.y, L = Math.hypot(dx, dy);
+  const d = Math.sqrt(Math.max(L * L - AX_Y * AX_Y, 1));
+  const aim = (Math.atan2(dy, dx) - Math.atan2(AX_Y, d)) * 180 / Math.PI;
+  const ext = d - DISC_FRONT - LUNGE - TIP_REST;
+  $('#disc').setAttribute('fill', color);
+  log(`ЦЕЛЬ ЗАХВАЧЕНА: X${Math.round(P.x)} Y${Math.round(P.y)}`);
+
+  gsap.timeline({ onComplete: () => { busy = false; S.locked = false; S.look = S.angle; } })
+    .to(S, { angle: aim, duration: .45, ease: 'power2.inOut' }, 0)
+    .to(S, { jaw: 6, duration: .3, ease: 'power1.out' }, 0)
+    .add(() => sfx.hiss(.55), .3)
+    .to(S, { jaw: 32, duration: .28, ease: 'power3.out' }, .42)
+    .to(S, { bob: -18, ext: -14, duration: .34, ease: 'power2.out' }, .42)
+    .to(S, { mini: 1, duration: .16, ease: 'power2.out' }, .66)
+    .add(() => Object.assign(shadowAt, W), 0)
+    .to(S, { shadow: .25, duration: .3 }, .5)
+    .to(S, { shadow: 1, duration: .16, ease: 'power4.in' }, .8)
+    .to(S, { shadow: 0, duration: .4, ease: 'power2.in' }, 1.33)
+    .to(S, { ext, bob: LUNGE, duration: .16, ease: 'power4.in' }, .8)
+    .add(() => impact(P, W, type, color), .96)
+    .to('#tipSquash', { scaleX: .78, transformOrigin: '100% 50%', duration: .04 }, .96)
+    .to('#tipSquash', { scaleX: 1, duration: .35, ease: 'elastic.out(1.2,.35)' }, 1.01)
+    .to(S, { grind: 1, duration: .14, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 1.01)
+    .to(S, { ext: 0, mini: 0, duration: .45, ease: 'power3.inOut' }, 1.33)
+    .to(S, { bob: 0, duration: .5, ease: 'power2.out' }, 1.33)
+    .to(S, { jaw: 0, duration: .18, ease: 'power4.in' }, 1.72)
+    .add(() => { sfx.snap(); drop(headToWorld(240, 20)); }, 1.9);
+}
+
+function hissAt(W) {
+  if (busy) return;
+  lookAt(W);
+  gsap.timeline().to(S, { jaw: 14, duration: .18 }).to(S, { jaw: 0, duration: .35, ease: 'power2.in' }, '+=.35');
+  sfx.hiss(.7);
+  log('ЦЕЛЬ ВНЕ ДОКУМЕНТА', 'warn');
+}
+
+/* ---------- input ---------- */
+worldSvg.addEventListener('click', e => {
+  const W = clientToWorld(e.clientX, e.clientY), P = clientToPaper(e.clientX, e.clientY);
+  Math.abs(P.x) < 200 && Math.abs(P.y) < 268 ? strike(P) : hissAt(W);
+});
+$('#stampBtn').addEventListener('click', () => strike(MP));
+$('#clearBtn').addEventListener('click', () => {
+  gsap.to('#prints > g, #splats > circle', { opacity: 0, duration: .4, onComplete: () => {
+    $('#prints').innerHTML = ''; $('#splats').innerHTML = '';
+    wdefs.querySelectorAll('mask').forEach(m => m.remove());
+  }});
+  nPrints = 0; $('#count').textContent = 'ОТТИСКОВ: 000';
+  log('ДОКУМЕНТ ОЧИЩЕН');
+});
+document.querySelectorAll('[data-type]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-type]').forEach(x => x.classList.toggle('on', x === b));
+  curType = b.dataset.type; log(`ФОРМА: ${TYPES[curType]}`);
+}));
+document.querySelectorAll('[data-ink]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-ink]').forEach(x => x.classList.toggle('on', x === b));
+  curInk = b.dataset.ink; $('#disc').setAttribute('fill', INKS[curInk]);
+  log(`ЧЕРНИЛА: ${b.textContent.trim().toUpperCase()}`);
+}));
+
+/* ---------- ambient life ---------- */
+function idle() {
+  gsap.delayedCall(rand(4, 8), () => {
+    if (!busy) {
+      if (Math.random() < .5) {
+        gsap.timeline()
+          .to(S, { jaw: 10, duration: .2 })
+          .to(S, { ext: 110, mini: .4, duration: .22 }, '<.05')
+          .to(S, { ext: 0, mini: 0, duration: .3 }, '+=.3')
+          .to(S, { jaw: 0, duration: .2 }, '<.1');
+      } else {
+        gsap.to(S, { jaw: 4, duration: .1, yoyo: true, repeat: 3 });
+      }
+    }
+    idle();
+  });
+}
+function flicker() {
+  gsap.delayedCall(rand(5, 11), () => {
+    gsap.timeline().to('#dim', { opacity: .35, duration: .05 }).to('#dim', { opacity: 0, duration: .05 })
+      .to('#dim', { opacity: .2, duration: .04 }, '+=.08').to('#dim', { opacity: 0, duration: .3 });
+    flicker();
+  });
+}
+
+/* ---------- logo egg: petals open, facehugger crawls out ---------- */
+const E = { open: 0, out: 0, twitch: 0 };
+const eL = $('#eL'), eR = $('#eR'), eF = $('#eF'), eBack = $('#eBack'), eVoid = $('#eVoid'),
+      eHugger = $('#eHugger'), eHugBody = $('#eHugBody'), eHugRibs = $('#eHugRibs'), eTail = $('#eTail');
+const LEGS = [];
+for (const k of [3, 2, 1, 0]) for (const sgn of [-1, 1]) {
+  const g = $('#eLegs');
+  LEGS.push({ k, sgn,
+    under: el('path', { stroke: '#2b2416', 'stroke-width': 3.8 }, g),
+    top: el('path', { stroke: '#cdbd94', 'stroke-width': 2.2 }, g),
+    j1: el('circle', { r: 0, fill: '#e8dbb4' }, g),
+    j2: el('circle', { r: 0, fill: '#e8dbb4' }, g) });
+}
+const clamp01 = v => Math.max(0, Math.min(1, v));
+const lerpP = (a, b, t) => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+const f1 = v => v.toFixed(1);
+
+function renderEgg() {
+  const t = performance.now() / 1000, o = E.open;
+  eL.setAttribute('transform', `rotate(${f1(-72 * o)} 35 42)`);
+  eR.setAttribute('transform', `rotate(${f1(72 * o)} 85 42)`);
+  eF.setAttribute('transform', `translate(0 44) scale(1 ${(1 - 1.75 * o).toFixed(3)}) translate(0 -44)`);
+  eBack.setAttribute('transform', `translate(0 42) scale(1 ${o.toFixed(3)}) translate(0 -42)`);
+  eVoid.setAttribute('rx', f1(12 + 13 * o));
+  eVoid.setAttribute('ry', f1(2 + 6 * o));
+  eVoid.setAttribute('opacity', (.7 + .3 * Math.sin(t * 2.4)).toFixed(2));
+
+  const by = 50 - 18 * E.out;
+  eHugger.setAttribute('opacity', clamp01(o * 3 - .4).toFixed(2));
+  eHugBody.setAttribute('cy', f1(by));
+  eHugRibs.setAttribute('d', `M 50 ${f1(by - 2)} Q 60 ${f1(by - 5)} 70 ${f1(by - 2)} M 52 ${f1(by + 1)} Q 60 ${f1(by - 2)} 68 ${f1(by + 1)}`);
+  const te = clamp01((E.out - .5) * 2), w = Math.sin(t * 5) * 4 * te;
+  eTail.setAttribute('d', `M 60 ${f1(by)} C ${f1(60 + w)} ${f1(by - 14 * te)}, ${f1(72 + w)} ${f1(by - 26 * te)}, ${f1(66 + w * 1.5)} ${f1(by - 38 * te)}`);
+  eTail.setAttribute('opacity', te.toFixed(2));
+
+  // legs unfold segment by segment: over the rim, down the shell
+  LEGS.forEach(({ k, sgn, under, top, j1, j2 }) => {
+    const e = clamp01((E.out - k * .07) / .79);
+    if (e <= 0) { under.setAttribute('d', ''); top.setAttribute('d', ''); j1.setAttribute('r', 0); j2.setAttribute('r', 0); return; }
+    const tw = E.twitch * Math.sin(t * 9 + k * 1.7 + sgn);
+    const p0 = { x: 60 + sgn * 6, y: by };
+    const p1o = { x: 60 + sgn * (14 + k * 4), y: 30 - k * 3 };
+    const p2o = { x: 60 + sgn * (28 + k * 5), y: 38 + k * 4 };
+    const p3o = { x: 60 + sgn * (32 + k * 5 + tw * 1.5), y: 56 + k * 10 + tw * 1.2 };
+    const e2 = clamp01(e * 3 - 1);
+    const p1 = lerpP(p0, p1o, clamp01(e * 3)), p2 = lerpP(p1, p2o, e2), p3 = lerpP(p2, p3o, clamp01(e * 3 - 2));
+    const d = `M ${f1(p0.x)} ${f1(p0.y)} L ${f1(p1.x)} ${f1(p1.y)} L ${f1(p2.x)} ${f1(p2.y)} L ${f1(p3.x)} ${f1(p3.y)}`;
+    under.setAttribute('d', d); top.setAttribute('d', d);
+    j1.setAttribute('cx', f1(p1.x)); j1.setAttribute('cy', f1(p1.y)); j1.setAttribute('r', 1.5);
+    j2.setAttribute('cx', f1(p2.x)); j2.setAttribute('cy', f1(p2.y)); j2.setAttribute('r', e2 > 0 ? 1.5 : 0);
+  });
+}
+gsap.ticker.add(renderEgg);
+
+let hatching = false;
+function hatch() {
+  if (hatching || reduced) return;
+  hatching = true;
+  gsap.timeline({ onComplete: () => { hatching = false; } })
+    .to(E, { open: .12, duration: .14, ease: 'power1.inOut', yoyo: true, repeat: 3 })
+    .to(E, { open: 1, duration: 1, ease: 'power2.out' })
+    .to(E, { out: 1, duration: 1.6, ease: 'power1.inOut' }, '-=.35')
+    .to(E, { twitch: 1, duration: .3 }, '-=.6')
+    .to(E, { twitch: 0, duration: .4 }, '+=2.2')
+    .to(E, { out: 0, duration: .7, ease: 'power3.in' })
+    .to(E, { open: 0, duration: .6, ease: 'power2.inOut' }, '-=.15');
+}
+function hatchLoop() { gsap.delayedCall(rand(5, 9), () => { hatch(); hatchLoop(); }); }
+$('#egg').addEventListener('click', hatch);
+
+/* ---------- intro ---------- */
+const boot = ['MU/TH/UR 6000 — ИНТЕРФЕЙС ОТТИСКА', 'ИНИЦИАЛИЗАЦИЯ БИОМЕХАНИЗМА...', 'ДОКУМЕНТ ОБНАРУЖЕН',
+              'КЛИК ПО ДОКУМЕНТУ = ЦЕЛЬ', 'КЛИК ВКЛЮЧАЕТ ЗВУК · M — ВЫКЛ'];
+if (reduced) {
+  gsap.set('#blackout', { opacity: 0 });
+  boot.forEach(l => log(l));
+  placeImprint(MP, curType, INKS[curInk], true);
+  Object.assign(E, { open: .9, out: 1 });
+} else {
+  gsap.set('#creature', { x: -340, y: -320 });
+  gsap.timeline()
+    .add(() => boot.forEach(l => log(l)), .2)
+    .to('#blackout', { opacity: .1, duration: .06 }, .4)
+    .to('#blackout', { opacity: .9, duration: .05 })
+    .to('#blackout', { opacity: .25, duration: .08 }, '+=.12')
+    .to('#blackout', { opacity: .95, duration: .05 })
+    .to('#blackout', { opacity: 0, duration: .7 }, '+=.18')
+    .to('#creature', { x: 0, y: 0, duration: 2.4, ease: 'power3.out' }, 1)
+    .to(S, { jaw: 16, duration: .3, ease: 'power2.out' }, 2.7)
+    .to(S, { jaw: 0, duration: .4, ease: 'power2.in' }, 3.3)
+    .add(hatch, 1.8)
+    .add(() => { idle(); flicker(); hatchLoop(); }, 6);
+}
+</script>
+</body>
+</html>

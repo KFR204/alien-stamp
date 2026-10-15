@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ПЕЧАТЬ — прототип</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a08;
+    --bone: #6b6f66;
+    --bone-dim: #3a3d36;
+    --rot: #3d4a35;
+    --ink: #9b1c1c;
+    --paper: #b8b0a0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: var(--bg); overflow: hidden; }
+  body { font-family: 'Inter', sans-serif; color: var(--bone); }
+
+  #stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #scene { height: 100vh; max-width: 100vw; }
+
+  .hud {
+    position: fixed; z-index: 10;
+    font-family: 'Michroma', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.42em;
+  }
+  #title {
+    top: 4vh; left: 4vw;
+    font-size: clamp(11px, 1.4vw, 16px);
+    color: var(--bone);
+    text-shadow: 0 0 18px rgba(107,111,102,.35);
+  }
+  #title small {
+    display: block; margin-top: 1.2em;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; letter-spacing: 0.3em;
+    color: var(--bone-dim);
+  }
+  #stampBtn {
+    bottom: 5vh; right: 4vw;
+    font-size: 11px;
+    padding: 16px 34px 14px 38px;
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid var(--bone-dim);
+    cursor: pointer;
+    letter-spacing: 0.42em;
+    font-family: 'Michroma', sans-serif;
+    text-transform: uppercase;
+    transition: border-color .3s, color .3s, box-shadow .3s;
+  }
+  #stampBtn:hover {
+    border-color: var(--ink);
+    color: #d8cfc0;
+    box-shadow: 0 0 24px rgba(155,28,28,.25), inset 0 0 18px rgba(155,28,28,.08);
+  }
+  #hint {
+    bottom: 5.6vh; left: 4vw;
+    font-size: 9px; letter-spacing: 0.34em;
+    color: var(--bone-dim);
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+<svg id="scene" viewBox="0 0 800 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="vign" cx="50%" cy="42%" r="75%">
+      <stop offset="0%" stop-color="#16170f"/>
+      <stop offset="55%" stop-color="#0d0e09"/>
+      <stop offset="100%" stop-color="#050503"/>
+    </radialGradient>
+    <radialGradient id="flashG" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e8e0cc" stop-opacity=".5"/>
+      <stop offset="100%" stop-color="#e8e0cc" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="paperG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b8b0a0"/>
+      <stop offset="100%" stop-color="#948c7c"/>
+    </linearGradient>
+    <linearGradient id="domeG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#23291f"/>
+      <stop offset="70%" stop-color="#141810"/>
+      <stop offset="100%" stop-color="#0b0d08"/>
+    </linearGradient>
+
+    <!-- ragged ink: displaced edges + cloudy alpha holes -->
+    <filter id="inkF" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="edge"/>
+      <feDisplacementMap in="SourceGraphic" in2="edge" scale="7" xChannelSelector="R" yChannelSelector="G" result="disp"/>
+      <feTurbulence id="inkTexTurb" type="fractalNoise" baseFrequency="0.13" numOctaves="4" seed="3" result="tex"/>
+      <feColorMatrix in="tex" type="matrix"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 2.1 -0.75" result="texA"/>
+      <feComposite in="disp" in2="texA" operator="in"/>
+    </filter>
+
+    <!-- displacement only, for the reveal mask edge -->
+    <filter id="edgeF" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" seed="11" result="e"/>
+      <feDisplacementMap in="SourceGraphic" in2="e" scale="14"/>
+    </filter>
+
+    <!-- film grain -->
+    <filter id="grainF">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="5" result="n"/>
+      <feColorMatrix in="n" type="matrix"
+        values="0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0 0.04  0 0 0 0.5 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <mask id="revealM">
+      <circle id="revealC" cx="400" cy="660" r="0" fill="#fff" filter="url(#edgeF)"/>
+    </mask>
+
+    <path id="sealArc" d="M 400 585 a 75 75 0 1 1 -0.01 0" fill="none"/>
+  </defs>
+
+  <rect width="800" height="900" fill="url(#vign)"/>
+  <rect width="800" height="900" fill="transparent" filter="url(#grainF)" opacity=".35"/>
+
+  <!-- background ribs, giger vibe -->
+  <g id="bgRibs" stroke="#1d221a" stroke-width="10" fill="none" opacity=".8"></g>
+
+  <!-- desk + document -->
+  <g id="desk">
+    <rect x="0" y="770" width="800" height="130" fill="#0c0d09"/>
+    <rect x="0" y="770" width="800" height="3" fill="#1a1c14"/>
+    <g id="paper" transform="rotate(-2 400 660)">
+      <rect x="230" y="480" width="340" height="400" fill="url(#paperG)"/>
+      <rect x="230" y="480" width="340" height="400" fill="none" stroke="#6e6858" stroke-width="1"/>
+      <g fill="#7d7666">
+        <rect x="258" y="512" width="180" height="9"/>
+        <rect x="258" y="534" width="284" height="5"/>
+        <rect x="258" y="547" width="284" height="5"/>
+        <rect x="258" y="560" width="250" height="5"/>
+        <rect x="258" y="600" width="284" height="4" opacity=".7"/>
+        <rect x="258" y="612" width="284" height="4" opacity=".7"/>
+        <rect x="258" y="624" width="220" height="4" opacity=".7"/>
+        <rect x="258" y="700" width="284" height="4" opacity=".6"/>
+        <rect x="258" y="712" width="260" height="4" opacity=".6"/>
+        <rect x="258" y="752" width="120" height="6"/>
+        <rect x="258" y="772" width="90" height="4" opacity=".7"/>
+      </g>
+    </g>
+    <ellipse id="stampShadow" cx="400" cy="676" rx="70" ry="10" fill="#000" opacity="0"/>
+  </g>
+
+  <!-- ink splatter layer -->
+  <g id="splat" fill="var(--ink)"></g>
+
+  <!-- seal imprint -->
+  <g id="imprint" mask="url(#revealM)" opacity="0">
+    <g id="imprintRot" filter="url(#inkF)" fill="none" stroke="var(--ink)">
+      <circle cx="400" cy="660" r="90" stroke-width="4"/>
+      <circle cx="400" cy="660" r="83" stroke-width="1.5"/>
+      <circle cx="400" cy="660" r="60" stroke-width="2"/>
+      <text font-family="Michroma, sans-serif" font-size="12.5" fill="var(--ink)" stroke="none" letter-spacing="3.5">
+        <textPath href="#sealArc" startOffset="2%">ИЗГОТОВЛЕНИЕ ПЕЧАТЕЙ * ООО «ЧУЖОЙ» * ОТТИСК</textPath>
+      </text>
+      <path id="sealStar" transform="translate(400 660)" stroke-width="2.5" fill="var(--ink)" fill-opacity=".85"/>
+      <text x="400" y="700" text-anchor="middle" font-family="Michroma, sans-serif"
+            font-size="11" fill="var(--ink)" stroke="none" letter-spacing="2">М.П.</text>
+    </g>
+  </g>
+
+  <!-- impact flash -->
+  <circle id="flash" cx="400" cy="656" r="120" fill="url(#flashG)" opacity="0"/>
+
+  <!-- JAW (built by JS, inserted before nest so nest overlaps its top) -->
+  <g id="jaw"></g>
+
+  <!-- nest / dome -->
+  <g id="nest">
+    <g id="domeRibs" stroke-linecap="round" fill="none"></g>
+    <ellipse cx="400" cy="128" rx="62" ry="20" fill="#060705"/>
+    <ellipse cx="400" cy="126" rx="62" ry="20" fill="none" stroke="#2c3325" stroke-width="2"/>
+    <g id="tendons" stroke="#262b1f" stroke-width="3" fill="none" stroke-linecap="round"></g>
+  </g>
+</svg>
+</div>
+
+<div class="hud" id="title">
+  Оттиск // прототип
+  <small>xeno-stamp v0.1 — челюсть, удар, печать</small>
+</div>
+<button class="hud" id="stampBtn">Поставить печать</button>
+<div class="hud" id="hint">клик по документу — тоже работает</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script>
+const SVG = 'http://www.w3.org/2000/svg';
+const $ = s => document.querySelector(s);
+const el = (t, a, parent) => {
+  const n = document.createElementNS(SVG, t);
+  for (const k in a) n.setAttribute(k, a[k]);
+  parent && parent.appendChild(n);
+  return n;
+};
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- background ribs ---------- */
+(() => {
+  const g = $('#bgRibs');
+  for (let i = 0; i < 7; i++) {
+    const x = 30 + i * 22;
+    el('path', { d: `M ${x} 900 C ${x-14} 600 ${x+20} 350 ${x-6} 120`, opacity: .5 - i*.05 }, g);
+    const xr = 770 - i * 22;
+    el('path', { d: `M ${xr} 900 C ${xr+14} 600 ${xr-20} 350 ${xr+6} 120`, opacity: .5 - i*.05 }, g);
+  }
+})();
+
+/* ---------- nest dome ribs ---------- */
+(() => {
+  const g = $('#domeRibs');
+  // concentric carapace arcs, widest at bottom
+  for (let i = 0; i < 9; i++) {
+    const rx = 60 + i * 26, ry = 18 + i * 9, cy = 128 - i * 15;
+    const shade = 34 + i * 4;
+    el('path', {
+      d: `M ${400-rx} ${cy} A ${rx} ${ry} 0 0 1 ${400+rx} ${cy}`,
+      stroke: `rgb(${shade},${shade+7},${shade-8})`,
+      'stroke-width': 7 - i * .4
+    }, g);
+  }
+  // vertical rib texture over the dome
+  for (let i = -4; i <= 4; i++) {
+    const x = 400 + i * 42;
+    el('path', {
+      d: `M ${x} 128 C ${x + i*4} 90 ${x + i*7} 55 ${x + i*10} 18`,
+      stroke: '#20251b', 'stroke-width': 4, opacity: .8
+    }, g);
+  }
+  // hanging tendons at mouth edges
+  const t = $('#tendons');
+  for (const [x, sway] of [[352, 10], [366, -6], [438, 8], [452, -9]]) {
+    el('path', { d: `M ${x} 132 q ${sway} 26 ${sway/2} 52`, 'stroke-width': 2.5, opacity: .9 }, t);
+  }
+})();
+
+/* ---------- ribbed jaw segment builder ---------- */
+function ribbedSegment(len, wTop, wBot, ribs, tone) {
+  const g = el('g');
+  // spine
+  el('path', { d: `M 0 6 L 0 ${len-8}`, stroke: '#141610', 'stroke-width': wBot*.4, 'stroke-linecap':'round' }, g);
+  for (let i = 0; i <= ribs; i++) {
+    const t = i / ribs;
+    const y = 8 + t * (len - 20);
+    const rx = wTop/2 + (wBot/2 - wTop/2) * t;
+    const ry = 5 + (1 - t) * 2.5;
+    const c = tone + Math.round(10 * Math.sin(i * 1.7));
+    el('ellipse', {
+      cx: 0, cy: y, rx, ry,
+      fill: `rgb(${c*.32},${c*.4},${c*.26})`,
+      stroke: `rgb(${c},${c+8},${c-10})`,
+      'stroke-width': 1.4
+    }, g);
+  }
+  return g;
+}
+
+/* ---------- stamp head ---------- */
+function stampHead() {
+  const g = el('g');
+  // knobby rim nodules (vestigial teeth -> stamp edge)
+  for (let i = -3; i <= 3; i++) {
+    el('circle', { cx: i*13, cy: 8 + Math.abs(i)*1.4, r: 5.5,
+      fill: '#2a2f22', stroke: '#454b38', 'stroke-width': 1.2 }, g);
+  }
+  // dome of the head
+  el('path', { d: 'M -46 10 Q -40 -12 0 -14 Q 40 -12 46 10 Z',
+    fill: '#232818', stroke: '#454b38', 'stroke-width': 1.5 }, g);
+  // stamp face — flattened disc, ink-stained underside
+  el('ellipse', { cx: 0, cy: 14, rx: 46, ry: 13, fill: '#1c1a12', stroke: '#4a4f3c', 'stroke-width': 1.5 }, g);
+  el('ellipse', { cx: 0, cy: 17, rx: 40, ry: 9, fill: '#5e1414', opacity: .8 }, g);
+  return g;
+}
+
+/* ---------- assemble jaw ---------- */
+const jawG = $('#jaw');
+const SEGS = [
+  { len: 200, wT: 74, wB: 56, ribs: 9,  tone: 92,  home: -80,  target: 150 },
+  { len: 190, wT: 56, wB: 42, ribs: 9,  tone: 104, home: -55,  target: 330 },
+  { len: 160, wT: 40, wB: 30, ribs: 8,  tone: 118, home: -30,  target: 470 },
+];
+const segEls = SEGS.map(s => {
+  const g = ribbedSegment(s.len, s.wT, s.wB, s.ribs, s.tone);
+  const wrap = el('g', { transform: `translate(400 ${s.home})` }, jawG);
+  wrap.appendChild(g);
+  return wrap;
+});
+const headEl = el('g', { transform: 'translate(400 -10)' }, jawG);
+const headInner = headEl.appendChild(stampHead());
+const HEAD = { home: -10, target: 624 };
+
+/* ---------- seal star ---------- */
+(() => {
+  let d = '';
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 ? 15 : 34, a = -Math.PI/2 + i * Math.PI/5;
+    d += (i ? 'L' : 'M') + (r*Math.cos(a)).toFixed(2) + ' ' + (r*Math.sin(a)).toFixed(2);
+  }
+  $('#sealStar').setAttribute('d', d + ' Z');
+})();
+
+/* ---------- splatter ---------- */
+function splatter() {
+  const g = $('#splat');
+  g.innerHTML = '';
+  const dots = [];
+  for (let i = 0; i < 16; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const r0 = 88 + Math.random() * 8;
+    const d = 12 + Math.random() * 46;
+    const c = el('circle', {
+      cx: 400 + Math.cos(a)*r0, cy: 660 + Math.sin(a)*r0*0.92,
+      r: .8 + Math.random()*3, opacity: .9
+    }, g);
+    dots.push({ c, x: Math.cos(a)*d, y: Math.sin(a)*d*0.92 });
+  }
+  dots.forEach(({c, x, y}) =>
+    gsap.to(c, { attr: { cx: `+=${x}`, cy: `+=${y}` }, opacity: 0,
+      duration: .5 + Math.random()*.3, ease: 'power2.out' }));
+}
+
+/* ---------- impact sound (after first gesture) ---------- */
+let actx = null;
+addEventListener('pointerdown', () => {
+  if (!actx) { try { actx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} }
+  actx && actx.state === 'suspended' && actx.resume();
+}, { once: false });
+function thud() {
+  if (!actx || actx.state !== 'running') return;
+  const t = actx.currentTime;
+  // wet low thump
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.frequency.setValueAtTime(120, t);
+  o.frequency.exponentialRampToValueAtTime(38, t + .12);
+  g.gain.setValueAtTime(.5, t);
+  g.gain.exponentialRampToValueAtTime(.001, t + .18);
+  o.connect(g).connect(actx.destination); o.start(t); o.stop(t + .2);
+  // squelch noise
+  const len = actx.sampleRate * .12, buf = actx.createBuffer(1, len, actx.sampleRate);
+  const ch = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) ch[i] = (Math.random()*2-1) * (1 - i/len);
+  const n = actx.createBufferSource(); n.buffer = buf;
+  const f = actx.createBiquadFilter(); f.type = 'lowpass';
+  f.frequency.setValueAtTime(900, t);
+  f.frequency.exponentialRampToValueAtTime(180, t + .12);
+  const ng = actx.createGain(); ng.gain.setValueAtTime(.35, t);
+  n.connect(f).connect(ng).connect(actx.destination); n.start(t);
+}
+
+/* ---------- strike timeline ---------- */
+const imprint = $('#imprint'), revealC = $('#revealC'),
+      flash = $('#flash'), shadow = $('#stampShadow'),
+      imprintRot = $('#imprintRot'), inkTex = $('#inkTexTurb');
+
+function resetImprint() {
+  gsap.set(imprint, { opacity: 0 });
+  gsap.set(revealC, { attr: { r: 0 } });
+  $('#splat').innerHTML = '';
+}
+function goHome(instant) {
+  const set = instant ? gsap.set : gsap.to;
+  segEls.forEach((s, i) => set(s, { attr: { transform: `translate(400 ${SEGS[i].home})` }, duration: .3 }));
+  set(headEl, { attr: { transform: `translate(400 ${HEAD.home})` }, duration: .3 });
+}
+
+let striking = false;
+function strike() {
+  if (striking) return;
+  striking = true;
+  resetImprint();
+  // every imprint unique
+  gsap.set(imprintRot, { rotation: gsap.utils.random(-7, 7), transformOrigin: '400px 660px' });
+  inkTex.setAttribute('seed', Math.floor(Math.random() * 100));
+
+  const tl = gsap.timeline({ onComplete: () => striking = false });
+  const T = .46; // impact moment
+
+  // deploy: outer sleeve first
+  tl.to(segEls[0], { attr: { transform: `translate(400 ${SEGS[0].target})` }, duration: .42, ease: 'power3.in' }, 0)
+    .to(segEls[1], { attr: { transform: `translate(400 ${SEGS[1].target})` }, duration: .38, ease: 'power3.in' }, .07)
+    .to(segEls[2], { attr: { transform: `translate(400 ${SEGS[2].target})` }, duration: .32, ease: 'power3.in' }, .14)
+    .to(headEl,   { attr: { transform: `translate(400 ${HEAD.target})` },    duration: .26, ease: 'power4.in' }, .20);
+
+  // impact
+  tl.add(() => { splatter(); thud(); }, T)
+    .to(imprint, { opacity: 1, duration: .05 }, T)
+    .to(revealC, { attr: { r: 97 }, duration: .22, ease: 'power4.out' }, T)
+    .fromTo(flash, { opacity: .45 }, { opacity: 0, duration: .35 }, T)
+    .fromTo(shadow, { opacity: .4 }, { opacity: .18, duration: .4 }, T)
+    .to(headInner, { scaleY: .82, transformOrigin: '50% 100%', duration: .05 }, T)
+    .to(headInner, { scaleY: 1, duration: .3, ease: 'elastic.out(1.4,.4)' }, T + .06)
+    // screen shake
+    .fromTo('#stage', { x: -4 }, { x: 4, duration: .03, repeat: 5, yoyo: true, ease: 'none' }, T)
+    .set('#stage', { x: 0 }, T + .2)
+    .fromTo('#desk', { y: 0 }, { y: 3, duration: .05, yoyo: true, repeat: 1 }, T);
+
+  // retract — inner first, quick
+  const R = T + .85;
+  tl.to(headEl,   { attr: { transform: `translate(400 ${HEAD.home})` },    duration: .3,  ease: 'power2.inOut' }, R)
+    .to(segEls[2], { attr: { transform: `translate(400 ${SEGS[2].home})` }, duration: .34, ease: 'power2.inOut' }, R + .05)
+    .to(segEls[1], { attr: { transform: `translate(400 ${SEGS[1].home})` }, duration: .36, ease: 'power2.inOut' }, R + .12)
+    .to(segEls[0], { attr: { transform: `translate(400 ${SEGS[0].home})` }, duration: .38, ease: 'power2.inOut' }, R + .2)
+    .to(shadow, { opacity: 0, duration: .5 }, R);
+}
+
+/* ---------- anticipation: jaws peek & twitch ---------- */
+function anticipation() {
+  const tl = gsap.timeline({ onComplete: strike });
+  segEls.forEach((s, i) => {
+    tl.to(s, { attr: { transform: `translate(400 ${SEGS[i].home + 26 + i*8})` },
+      duration: .3, ease: 'power2.out' }, 0);
+  });
+  tl.to(headEl, { attr: { transform: `translate(400 ${HEAD.home + 30})` }, duration: .3, ease: 'power2.out' }, 0);
+  // twitch
+  for (let k = 0; k < 3; k++) {
+    tl.to(jawG, { x: k % 2 ? 1.5 : -1.5, duration: .05 }, .35 + k * .07);
+  }
+  tl.set(jawG, { x: 0 })
+    .to(jawG, { y: 6, duration: .28, ease: 'power2.in' }, '>-.05')
+    .set(jawG, { y: 0 });
+  return tl;
+}
+
+/* ---------- ambient life ---------- */
+if (!reduced) {
+  gsap.to('#nest', { scaleY: 1.03, transformOrigin: '50% 0%', duration: 3.2, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+  gsap.to('#tendons', { x: 3, duration: 4, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+  gsap.to('#bgRibs', { opacity: .6, duration: 5, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+}
+
+/* ---------- wire up ---------- */
+$('#stampBtn').addEventListener('click', strike);
+$('#paper').addEventListener('click', strike);
+$('#desk').addEventListener('click', strike);
+
+if (reduced) {
+  gsap.set(imprint, { opacity: 1 });
+  gsap.set(revealC, { attr: { r: 97 } });
+} else {
+  goHome(true);
+  gsap.delayedCall(.9, anticipation);
+}
+</script>
+</body>
+</html>
