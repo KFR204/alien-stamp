@@ -136,11 +136,14 @@
 
   /* ===== landing: the scene occupies the first viewport, content scrolls below ===== */
   #scene { position: relative; height: 100vh; overflow: hidden; }
-  #scrollHint { position: absolute; bottom: 2.2vh; left: 50%; transform: translateX(-50%); z-index: 21;
-    font-size: 10px; letter-spacing: .4em; color: var(--bone-dim); text-decoration: none; white-space: nowrap;
+  #scrollHint { position: absolute; bottom: 3vh; left: 50%; transform: translateX(-50%); z-index: 21;
+    font-size: 11px; letter-spacing: .34em; color: var(--accent); text-decoration: none; white-space: nowrap;
+    padding: 10px 18px 9px; border: 1px solid #2c5c3a; background: rgba(3,10,6,.72);
+    box-shadow: 0 0 22px rgba(127,199,150,.18), inset 0 0 14px rgba(127,199,150,.08);
+    text-shadow: 0 0 8px rgba(127,199,150,.5);
     animation: hintPulse 2.4s ease-in-out infinite; }
-  #scrollHint:hover { color: var(--accent); }
-  @keyframes hintPulse { 0%, 100% { opacity: .4; transform: translateX(-50%) translateY(0); }
+  #scrollHint:hover { color: #e4efe2; border-color: var(--accent); box-shadow: 0 0 34px rgba(127,199,150,.3); }
+  @keyframes hintPulse { 0%, 100% { opacity: .75; transform: translateX(-50%) translateY(0); }
     50% { opacity: 1; transform: translateX(-50%) translateY(6px); } }
 
   main#page { position: relative; z-index: 30;
@@ -151,29 +154,45 @@
   .sec h2 { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: clamp(20px, 2.6vw, 34px);
     letter-spacing: .14em; text-transform: uppercase; line-height: 1.4; margin-bottom: 46px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
-  .card { position: relative; padding: 26px 24px 22px; border: 1px solid #1d2c22; transition: .3s;
-    background: linear-gradient(160deg, rgba(10,20,14,.85), rgba(3,7,5,.92));
+  /* card = 1px "border" incl. the cut corner: outer layer is the border color,
+     inner ::before is the card surface clipped 1px smaller */
+  .card { position: relative; padding: 26px 24px 22px; background: #1d2c22; transition: .3s;
+    display: flex; flex-direction: column;
     clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%); }
-  .card:hover { border-color: #34503d; box-shadow: 0 0 30px rgba(127,199,150,.08); }
-  .card .stamp { display: block; width: 86px; height: 86px; margin-bottom: 16px; }
+  .card::before { content: ''; position: absolute; inset: 1px; transition: .3s;
+    background: linear-gradient(160deg, #0b140e, #030705);
+    clip-path: polygon(0 0, calc(100% - 17px) 0, 100% 17px, 100% 100%, 0 100%); }
+  .card > * { position: relative; }
+  .card:hover { background: #34503d; box-shadow: 0 0 30px rgba(127,199,150,.08); }
+  .card:hover::before { background: linear-gradient(160deg, #0e1a12, #040806); }
+  .card .stamp { display: block; width: 172px; height: 172px; margin-bottom: 16px; }
   .card h3 { font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 13px;
-    letter-spacing: .18em; text-transform: uppercase; margin-bottom: 10px; }
+    letter-spacing: .18em; text-transform: uppercase; margin-bottom: 10px;
+    line-height: 1.5; min-height: 3em; }
   .price { font-family: 'Unbounded', sans-serif; font-weight: 300; font-size: 22px;
     color: var(--accent); letter-spacing: .08em; margin-bottom: 8px; }
   .meta { font-size: 10.5px; line-height: 1.8; letter-spacing: .08em; color: var(--bone-dim); margin-bottom: 18px; }
-  .card-btn { display: inline-block; font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
+  .card-btn { display: inline-block; align-self: flex-start; margin-top: auto; font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
     color: var(--bone); text-decoration: none; border: 1px solid #23362a; padding: 10px 18px; transition: .25s; }
   .card-btn:hover { border-color: var(--accent); color: #e4efe2; box-shadow: 0 0 20px rgba(127,199,150,.15); }
   .note { margin-top: 28px; font-size: 11px; line-height: 1.9; letter-spacing: .06em; color: var(--bone-dim); max-width: 660px; }
 
-  #galGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; }
-  .tile { position: relative; aspect-ratio: 1 / 1.1; padding: 9%; overflow: hidden; border: 1px solid #1d2c22;
-    background: linear-gradient(155deg, #181d16, #090d09); }
-  .tile::before { content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 40% 28%, rgba(205,195,165,.12), transparent 62%); }
-  .tile svg { width: 100%; height: 82%; }
-  .tile span { position: absolute; left: 12px; bottom: 10px; font-size: 9px;
-    letter-spacing: .25em; color: var(--bone-dim); text-transform: uppercase; }
+  .review { padding: 30px 28px 26px; }
+  .review .quote { font-size: 12.5px; line-height: 1.95; letter-spacing: .04em; color: var(--bone);
+    margin-bottom: 20px; }
+  .review .who { font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--accent); margin-top: auto; }
+
+  .carousel { display: flex; align-items: center; gap: 16px; }
+  .car-view { flex: 1; overflow: hidden; }
+  .car-track { display: flex; gap: 18px; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+  .car-track .card { flex: 0 0 calc(33.333% - 12px); }
+  .car-btn { flex-shrink: 0; width: 44px; height: 44px; font-size: 13px; cursor: pointer;
+    color: var(--bone-dim); background: rgba(3,8,5,.6); border: 1px solid #23362a; transition: .25s; }
+  .car-btn:hover { color: var(--bone); border-color: var(--accent); box-shadow: 0 0 20px rgba(127,199,150,.15); }
+  .car-dots { display: flex; gap: 10px; justify-content: center; margin-top: 22px; }
+  .car-dots i { width: 8px; height: 8px; border: 1px solid #34503d; cursor: pointer; transition: .25s; }
+  .car-dots i.on { background: var(--accent); border-color: var(--accent); }
 
   .steps { border: 1px solid #1d2c22; background: rgba(3,7,5,.9); counter-reset: st; }
   .step { display: flex; gap: 26px; align-items: baseline; padding: 24px 28px; border-bottom: 1px solid #14211a; }
@@ -212,10 +231,15 @@
   .ticket .send #sendTg { border-color: #26485e; }
   .ticket .hint { margin-top: 14px; font-size: 9px; line-height: 1.8; letter-spacing: .1em; color: var(--bone-dim); }
 
-  .c-link { display: block; text-decoration: none; color: var(--bone); padding: 24px 26px; transition: .25s;
-    border: 1px solid #1d2c22; background: linear-gradient(160deg, rgba(10,20,14,.85), rgba(3,7,5,.92));
+  .c-link { position: relative; display: block; text-decoration: none; color: var(--bone); padding: 24px 26px; transition: .25s;
+    background: #1d2c22;
     clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%); }
-  .c-link:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,.5); }
+  .c-link::before { content: ''; position: absolute; inset: 1px; transition: .25s;
+    background: linear-gradient(160deg, #0b140e, #030705);
+    clip-path: polygon(0 0, calc(100% - 17px) 0, 100% 17px, 100% 100%, 0 100%); }
+  .c-link > span { position: relative; }
+  .c-link:hover { background: var(--accent); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,.5); }
+  .c-link:hover::before { background: linear-gradient(160deg, #10201a, #050a08); }
   .c-link .net { display: block; font-family: 'Unbounded', sans-serif; font-size: 12px;
     letter-spacing: .25em; text-transform: uppercase; color: var(--accent); margin-bottom: 9px; }
   .c-link .val { font-size: 13px; letter-spacing: .08em; }
@@ -230,6 +254,8 @@
     .ticket { position: static; }
     .sec { padding: 70px 5vw 36px; }
     #scrollHint { display: none; }
+    .car-track .card { flex-basis: 100%; }
+    .car-btn { width: 36px; height: 36px; font-size: 11px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .rv { opacity: 1; transform: none; transition: none; }
@@ -284,7 +310,7 @@
         <rect x="-214" y="-284" width="428" height="568" fill="#000" opacity=".55" transform="translate(12 18)"/>
         <rect id="sheet" x="-210" y="-280" width="420" height="560" fill="url(#paperG)"/>
         <text x="-180" y="-228" font-family="Unbounded" font-weight="500" font-size="15" letter-spacing="3" fill="#5e5241">ДОГОВОР № 0426</text>
-        <text x="-180" y="-208" font-family="IBM Plex Mono" font-size="9" fill="#7a6d58">г. Санкт-Петербург · 15.10.2026</text>
+        <text id="docDate" x="-180" y="-208" font-family="IBM Plex Mono" font-size="9" fill="#7a6d58"></text>
         <g id="lines" fill="#8a7c65"></g>
         <text x="-180" y="122" font-family="IBM Plex Mono" font-size="9" fill="#6f6350">ИСПОЛНИТЕЛЬ</text>
         <text x="40" y="122" font-family="IBM Plex Mono" font-size="9" fill="#6f6350">ЗАКАЗЧИК</text>
@@ -547,7 +573,7 @@
   <button class="btn" id="stampBtn">Поставить печать</button>
 </div>
 
-<a id="scrollHint" href="#services">▼ УСЛУГИ · ЦЕНЫ · ЗАКАЗ ▼</a>
+<a id="scrollHint" href="#services">▼ ЗАКАЗАТЬ ПЕЧАТЬ ▼</a>
 <div id="blackout"></div>
 
 </section>
@@ -557,78 +583,48 @@
 
   <!-- 01 services / prices -->
   <section class="sec" id="services"><div class="sec-in">
-    <div class="sec-no">// 01 · УСЛУГИ И ЦЕНЫ</div>
-    <h2>Печати и штампы<br>за 1–2 дня</h2>
+    <div class="sec-no">// УСЛУГИ И ЦЕНЫ</div>
+    <h2>Печати и штампы</h2>
     <div class="grid">
       <div class="card rv">
         <svg class="stamp" viewBox="-80 -80 160 160" data-shape="round" data-ink="#2b3a95"></svg>
         <h3>Круглая печать</h3>
-        <div class="price">от 800 ₽</div>
-        <div class="meta">Для ИП и ООО · срок 1 рабочий день · оснастка в комплекте</div>
+        <div class="price">от 600 ₽</div>
+        <div class="meta">Для ИП и организаций</div>
         <a class="card-btn" href="#order" data-otype="round">Заказать</a>
       </div>
       <div class="card rv">
-        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="rect" data-ink="#8c1a12"></svg>
+        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="rect" data-ink="#2b3a95"></svg>
         <h3>Прямоугольный штамп</h3>
-        <div class="price">от 600 ₽</div>
-        <div class="meta">Утверждаю, копия верна, реквизиты · срок 1 рабочий день</div>
+        <div class="price">от 500 ₽</div>
+        <div class="meta">Штампы с текстом и реквизитами</div>
         <a class="card-btn" href="#order" data-otype="rect">Заказать</a>
       </div>
       <div class="card rv">
         <svg class="stamp" viewBox="-80 -80 160 160" data-shape="tri" data-ink="#2b3a95"></svg>
         <h3>Треугольная печать</h3>
-        <div class="price">от 900 ₽</div>
-        <div class="meta">Для документов и внутреннего пользования · срок 1 рабочий день</div>
+        <div class="price">от 700 ₽</div>
+        <div class="meta">Для документов и маркировки</div>
         <a class="card-btn" href="#order" data-otype="tri">Заказать</a>
       </div>
       <div class="card rv">
-        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="round" data-ink="#8c1a12"></svg>
+        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="fac" data-ink="#2b3a95"></svg>
         <h3>Факсимиле</h3>
-        <div class="price">от 1200 ₽</div>
-        <div class="meta">Печать вашей подписи · по скану или фото · 1–2 дня</div>
+        <div class="price">от 1000 ₽</div>
+        <div class="meta">Точное воспроизведение подписи</div>
         <a class="card-btn" href="#order" data-otype="fac">Заказать</a>
       </div>
-      <div class="card rv">
-        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="rect" data-ink="#2b3a95"></svg>
-        <h3>Датер и нумератор</h3>
-        <div class="price">от 1000 ₽</div>
-        <div class="meta">Автоматическая дата и нумерация · срок 1–2 дня</div>
-        <a class="card-btn" href="#order" data-otype="dater">Заказать</a>
-      </div>
-      <div class="card rv">
-        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="tri" data-ink="#8c1a12"></svg>
-        <h3>Оснастка и заправка</h3>
-        <div class="price">от 300 ₽</div>
-        <div class="meta">Замена оснастки, штемпельная подушка, чернила</div>
-        <a class="card-btn" href="#order" data-otype="other">Заказать</a>
-      </div>
     </div>
-    <p class="note">Цены ориентировочные — зависят от оснастки и сложности макета.
-      Срочное изготовление в день обращения — +50% к стоимости. Бесплатный эскиз оттиска до оплаты.</p>
-  </div></section>
-
-  <!-- 02 gallery -->
-  <section class="sec" id="gallery"><div class="sec-in">
-    <div class="sec-no">// 02 · ОТТИСКИ</div>
-    <h2>Примеры работ</h2>
-    <div class="grid" id="galGrid">
-      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="round" data-ink="#2b3a95"></svg><span>печать ООО</span></div>
-      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="rect" data-ink="#8c1a12"></svg><span>утверждаю</span></div>
-      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="tri" data-ink="#2b3a95"></svg><span>для документов</span></div>
-      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="round" data-ink="#8c1a12"></svg><span>печать ИП</span></div>
-      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="rect" data-ink="#2b3a95"></svg><span>копия верна</span></div>
-      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="tri" data-ink="#8c1a12"></svg><span>внутреннее пользование</span></div>
-    </div>
-    <p class="note">Оттиски сгенерированы тем же «механизмом», что ставит ксеноморф наверху — замените на фото реальных работ, когда будут готовы.</p>
+    <p class="note">Цены ориентировочные — зависят от оснастки и сложности макета.</p>
   </div></section>
 
   <!-- 03 steps -->
   <section class="sec" id="steps"><div class="sec-in">
-    <div class="sec-no">// 03 · ПРОЦЕДУРА</div>
+    <div class="sec-no">// ПРОЦЕДУРА</div>
     <h2>Как заказать</h2>
     <div class="steps">
       <div class="step rv"><div><b>Заявка</b><p>Заполните форму ниже или напишите в мессенджер — пришлите текст и реквизиты для печати.</p></div></div>
-      <div class="step rv"><div><b>Макет</b><p>В течение 30 минут присылаем бесплатный эскиз оттиска. Согласуем и подтверждаем заказ.</p></div></div>
+      <div class="step rv"><div><b>Макет</b><p>После заказа присылаем бесплатный эскиз оттиска. Согласуем и подтверждаем заказ.</p></div></div>
       <div class="step rv"><div><b>Изготовление</b><p>Стандартно — 1–2 рабочих дня. Срочный заказ — в день обращения, примерно 2 часа.</p></div></div>
       <div class="step rv"><div><b>Получение</b><p>Самовывоз из мастерской, доставка по городу или отправка почтой в любой регион.</p></div></div>
     </div>
@@ -636,7 +632,7 @@
 
   <!-- 04 order form -->
   <section class="sec" id="order"><div class="sec-in">
-    <div class="sec-no">// 04 · ОФОРМЛЕНИЕ ЗАКАЗА</div>
+    <div class="sec-no">// ОФОРМЛЕНИЕ ЗАКАЗА</div>
     <h2>Оставить заявку</h2>
     <div class="order-wrap">
       <form id="orderForm" onsubmit="return false">
@@ -647,8 +643,6 @@
             <button class="opt" data-otype="rect">Прямоугольная</button>
             <button class="opt" data-otype="tri">Треугольная</button>
             <button class="opt" data-otype="fac">Факсимиле</button>
-            <button class="opt" data-otype="dater">Датер</button>
-            <button class="opt" data-otype="other">Другое</button>
           </div>
         </div>
         <div class="fld">
@@ -687,9 +681,46 @@
     </div>
   </div></section>
 
+  <!-- reviews -->
+  <section class="sec" id="reviews"><div class="sec-in">
+    <div class="sec-no">// ОТЗЫВЫ</div>
+    <h2>Отзывы клиентов</h2>
+    <div class="carousel rv">
+      <button class="car-btn" id="revPrev" type="button">◄</button>
+      <div class="car-view"><div class="car-track" id="revTrack">
+        <div class="card review">
+          <p class="quote">«Заказывали печать для ООО — эскиз прислали через полчаса, на следующий день забрал готовую. Оттиск чёткий с первого нажатия».</p>
+          <div class="who">Игорь С. — ООО «НОСТРОМО»</div>
+        </div>
+        <div class="card review">
+          <p class="quote">«Срочно понадобился штамп "копия верна" — сделали за два часа, успели к отправке документов. Спасибо».</p>
+          <div class="who">Марина К. — бухгалтер</div>
+        </div>
+        <div class="card review">
+          <p class="quote">«Факсимиле получилось один в один с подписью, банк принял без вопросов. Буду заказывать ещё».</p>
+          <div class="who">Дмитрий Л. — ИП</div>
+        </div>
+        <div class="card review">
+          <p class="quote">«Треугольную печать делали для внутренних накладных. Всё аккуратно, ни одной подтёки на оттиске».</p>
+          <div class="who">Ольга В. — логист</div>
+        </div>
+        <div class="card review">
+          <p class="quote">«Заказал через форму на сайте вечером — утром уже прислали макет. Удобно, никуда звонить не пришлось».</p>
+          <div class="who">Антон П. — руководитель отдела</div>
+        </div>
+        <div class="card review">
+          <p class="quote">«Второй раз обращаемся: первую печать служит три года без единой заправки. Рекомендую».</p>
+          <div class="who">Светлана М. — ООО «СЕВЕР»</div>
+        </div>
+      </div></div>
+      <button class="car-btn" id="revNext" type="button">►</button>
+    </div>
+    <div class="car-dots" id="revDots"></div>
+  </div></section>
+
   <!-- 05 contacts -->
   <section class="sec" id="contacts"><div class="sec-in">
-    <div class="sec-no">// 05 · СВЯЗЬ</div>
+    <div class="sec-no">// СВЯЗЬ</div>
     <h2>Контакты</h2>
     <div class="grid">
       <a class="c-link rv" href="tel:+70000000000"><span class="net">Телефон</span><span class="val">+7 (000) 000-00-00</span></a>
@@ -1027,12 +1058,21 @@ function shapeRound(g, c, id) {
   const tx = el('text', { 'font-family': 'Unbounded', 'font-weight': 500, 'font-size': 6.6, fill: c, stroke: 'none' }, g);
   const tp = el('textPath', { href: `#arc${id}`, textLength: 256, lengthAdjust: 'spacing' }, tx);
   tp.textContent = 'ALIEN ШТАМП • ИЗГОТОВЛЕНИЕ ПЕЧАТЕЙ •';
-  for (let k = 0; k < 7; k++) {
-    const a = k * Math.PI * 2 / 7;
-    const p = (r, o) => `${(r * Math.cos(a + o)).toFixed(2)} ${(r * Math.sin(a + o)).toFixed(2)}`;
-    el('path', { d: `M ${p(7, 0)} Q ${p(20, .55)} ${p(27, .2)}`, 'stroke-width': 2.4 }, g);
+  // alien head emblem: filled silhouette, details cut out as evenodd holes
+  let hd = 'M 0 -26 C 8 -26 12.5 -17 12.9 -7 C 13.1 -1 13.1 4 13 8 C 12.9 12 12.3 16 11 19'
+    + ' C 8.5 23.5 4.5 26 0 26 C -4.5 26 -8.5 23.5 -11 19 C -12.3 16 -12.9 12 -13 8'
+    + ' C -13.1 4 -13.1 -1 -12.9 -7 C -12.5 -17 -8 -26 0 -26 Z'
+    + 'M 8.6 -18.5 C 10.4 -10.5 10.9 -2.5 10.7 5.5 C 10.6 9 9.9 12.2 8.9 14.4 L 10.2 15'
+    + ' C 11.4 12.7 12.2 9.2 12.3 5.6 C 12.5 -2.6 12.1 -10.7 10.5 -18.9 Z'
+    + 'M -8.6 -18.5 C -10.4 -10.5 -10.9 -2.5 -10.7 5.5 C -10.6 9 -9.9 12.2 -8.9 14.4 L -10.2 15'
+    + ' C -11.4 12.7 -12.2 9.2 -12.3 5.6 C -12.5 -2.6 -12.1 -10.7 -10.5 -18.9 Z'
+    + 'M -8.5 11.8 Q 0 17 8.5 11.8 Q 0 14.6 -8.5 11.8 Z';
+  for (const y of [.8, 4.6, 8.4]) {
+    hd += `M 11 ${y} l 1.9 .5 l -.4 1.6 l -1.9 -.6 Z M -11 ${y} l -1.9 .5 l .4 1.6 l 1.9 -.6 Z`;
   }
-  el('circle', { r: 4, fill: c, stroke: 'none' }, g);
+  for (const tx of [-6, -3, 0, 3, 6]) hd += `M ${tx - 1.2} 17.2 a 1.2 2.6 0 1 0 2.4 0 a 1.2 2.6 0 1 0 -2.4 0 Z`;
+  for (const tx of [-4.5, -1.5, 1.5, 4.5]) hd += `M ${tx - 1.05} 21.6 a 1.05 2 0 1 0 2.1 0 a 1.05 2 0 1 0 -2.1 0 Z`;
+  el('path', { d: hd, fill: c, stroke: 'none', 'fill-rule': 'evenodd', transform: 'rotate(-50)' }, g);
 }
 function shapeRect(g, c) {
   el('rect', { x: -70, y: -32, width: 140, height: 64, 'stroke-width': 3 }, g);
@@ -1060,7 +1100,22 @@ function shapeTri(g, c) {
   t(12, 6.6, 'ДОКУМЕНТОВ', 60);
   t(25, 4.8, 'ВЕЙЛАНД-ЮТАНИ', 74);
 }
-const SHAPES = { round: shapeRound, rect: shapeRect, tri: shapeTri };
+function shapeFac(g, c) {
+  // facsimile: handwritten signature — capital Z, small e, tall l-loop with long tail, ur humps, exit stroke
+  el('path', { d: 'M -62 12 C -66 2, -58 -8, -46 -10 C -34 -12, -22 -8, -16 0 C -10 8, -22 16, -40 21'
+    + ' C -52 25, -58 30, -54 36 C -49 42, -36 37, -28 28',
+    'stroke-width': 2.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+  el('path', { d: 'M -30 28 C -36 23, -37 15, -31 12 C -25 9, -21 13, -23 19 C -25 25, -31 28, -35 26',
+    'stroke-width': 2.3, 'stroke-linecap': 'round' }, g);
+  el('path', { d: 'M -26 24 C -10 6, 8 -16, 20 -38 C 26 -48, 33 -49, 32 -40 C 30 -30, 18 -6, 4 14'
+    + ' C -8 32, -20 46, -18 53 C -16 58, -6 55, 2 44',
+    'stroke-width': 2.5, 'stroke-linecap': 'round' }, g);
+  el('path', { d: 'M 4 12 C 8 4, 14 -2, 20 -4 C 24 -5, 24 0, 21 5 C 18 11, 14 17, 18 19'
+    + ' C 22 21, 28 13, 34 5 C 38 -1, 43 -4, 47 -2 C 50 0, 49 6, 46 10',
+    'stroke-width': 2.3, 'stroke-linecap': 'round' }, g);
+  el('path', { d: 'M 46 10 C 54 2, 64 -6, 72 -12', 'stroke-width': 2, 'stroke-linecap': 'round' }, g);
+}
+const SHAPES = { round: shapeRound, rect: shapeRect, tri: shapeTri, fac: shapeFac };
 
 let nPrints = 0;
 function placeImprint(P, type, color, instant) {
@@ -1328,6 +1383,9 @@ if (reduced) {
     .add(() => { idle(); flicker(); hatchLoop(); }, 6);
 }
 
+/* ---------- document date: always today ---------- */
+$('#docDate').textContent = 'г. Санкт-Петербург · ' + new Date().toLocaleDateString('ru-RU');
+
 /* ---------- landing: generated sample imprints ---------- */
 document.querySelectorAll('svg[data-shape]').forEach(svg => {
   const g = el('g', { transform: `rotate(${rand(-9, 9)})`, opacity: rand(.8, .95) }, svg);
@@ -1338,7 +1396,7 @@ document.querySelectorAll('svg[data-shape]').forEach(svg => {
 
 /* ---------- order form ---------- */
 const OTYPE_LABEL = { round: 'Круглая печать', rect: 'Прямоугольный штамп', tri: 'Треугольная печать',
-  fac: 'Факсимиле', dater: 'Датер/нумератор', other: 'Другое' };
+  fac: 'Факсимиле' };
 const ORDER_PHONE = '70000000000'; // замените на свой номер для WhatsApp
 const ORDER_TG = 'https://t.me/alien_stamp'; // замените на свой аккаунт
 const oType = $('#otype'), oName = $('#oName'), oPhone = $('#oPhone'), oText = $('#oText'), oComm = $('#oComm');
@@ -1382,6 +1440,34 @@ $('#copyBtn').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(orderText()); sendHint('Текст заявки скопирован в буфер.'); }
   catch (e) { sendHint('Не удалось скопировать — выделите заявку вручную.'); }
 });
+
+/* ---------- reviews carousel ---------- */
+const revTrack = $('#revTrack'), revDots = $('#revDots');
+const revCards = revTrack.children.length;
+let revIdx = 0, revTimer = 0;
+const revPerView = () => innerWidth <= 860 ? 1 : 3;
+const revPages = () => revCards - revPerView() + 1;
+function revGo(i) {
+  revIdx = (i + revPages()) % revPages();
+  revTrack.style.transform = `translateX(${-revIdx * (revTrack.children[0].offsetWidth + 18)}px)`;
+  [...revDots.children].forEach((d, k) => d.classList.toggle('on', k === revIdx));
+}
+function revBuild() {
+  revDots.innerHTML = '';
+  for (let k = 0; k < revPages(); k++) {
+    const d = document.createElement('i');
+    d.addEventListener('click', () => revGo(k));
+    revDots.appendChild(d);
+  }
+  revGo(revIdx);
+}
+function revAuto() { clearInterval(revTimer); revTimer = setInterval(() => revGo(revIdx + 1), 7000); }
+$('#revPrev').addEventListener('click', () => { revGo(revIdx - 1); revAuto(); });
+$('#revNext').addEventListener('click', () => { revGo(revIdx + 1); revAuto(); });
+$('.carousel').addEventListener('mouseenter', () => clearInterval(revTimer));
+$('.carousel').addEventListener('mouseleave', revAuto);
+window.addEventListener('resize', revBuild);
+revBuild(); revAuto();
 
 /* ---------- reveal on scroll ---------- */
 const io = new IntersectionObserver(es => es.forEach(e => {
