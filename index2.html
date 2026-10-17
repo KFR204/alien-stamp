@@ -57,7 +57,7 @@
   #brand h1 span:last-child { margin-right: -.32em; }
   #egg { height: 2.4em; width: auto; overflow: visible; margin: -.6em .1em -.25em -.05em; cursor: pointer;
     filter: drop-shadow(0 0 14px rgba(127,199,150,.18)); }
-  #brand p { margin-top: 16px; font-size: 14px; letter-spacing: .32em; color: var(--bone-dim); text-transform: uppercase; }
+  #brand p { margin-top: 30px; font-size: 16px; letter-spacing: .3em; color: var(--bone-dim); text-transform: uppercase; }
 
   /* ---- monitor housing ---- */
   #term { top: calc(4.5vh + clamp(24px, 3.6vw, 54px) * 2.2 + 50px); right: 4vw; width: min(430px, 42vw);
@@ -334,52 +334,89 @@
   <h1><span>ALIEN</span>
     <svg id="egg" viewBox="0 0 120 150" aria-hidden="true">
       <defs>
-        <radialGradient id="eShell" cx="38%" cy="42%" r="70%">
-          <stop offset="0%" stop-color="#5f6347"/>
-          <stop offset="45%" stop-color="#2c3020"/>
-          <stop offset="100%" stop-color="#0b0d08"/>
+        <radialGradient id="eShell" gradientUnits="userSpaceOnUse" cx="44" cy="58" r="92">
+          <stop offset="0%" stop-color="#5a5947"/>
+          <stop offset="35%" stop-color="#33332a"/>
+          <stop offset="75%" stop-color="#15160f"/>
+          <stop offset="100%" stop-color="#050604"/>
         </radialGradient>
-        <radialGradient id="eVoidG" cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stop-color="#c8ef86"/>
-          <stop offset="40%" stop-color="#4d6a22"/>
-          <stop offset="100%" stop-color="#050704"/>
+        <radialGradient id="eVoidG" cx="50%" cy="55%" r="50%">
+          <stop offset="0%" stop-color="#8aa45c" stop-opacity=".55"/>
+          <stop offset="45%" stop-color="#141c0c" stop-opacity=".9"/>
+          <stop offset="100%" stop-color="#030402" stop-opacity="0"/>
         </radialGradient>
-        <linearGradient id="eHug" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#e6d8b0"/>
-          <stop offset="100%" stop-color="#9a8a60"/>
+        <radialGradient id="eHaloG">
+          <stop offset="0%" stop-color="#a9cf7a" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="#a9cf7a" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="eMistG">
+          <stop offset="0%" stop-color="#9fc9b4" stop-opacity=".3"/>
+          <stop offset="100%" stop-color="#9fc9b4" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="eRim" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#a6dccf" stop-opacity=".35"/>
+          <stop offset="30%" stop-color="#a6dccf" stop-opacity="0"/>
+          <stop offset="85%" stop-color="#a6dccf" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#a6dccf" stop-opacity=".22"/>
         </linearGradient>
-        <clipPath id="eBodyClip">
-          <path d="M -20 -60 H 140 V 42 H -20 Z M 35 42 A 25 8 0 0 0 85 42 A 25 8 0 0 0 35 42 Z"/>
-        </clipPath>
+        <!-- leathery bumps + wet highlights; the shell is static so this renders once -->
+        <filter id="eSkin" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.05 0.032" numOctaves="3" seed="11" result="n"/>
+          <feDiffuseLighting in="n" surfaceScale="1.6" diffuseConstant="1" lighting-color="#fff" result="d">
+            <feDistantLight azimuth="235" elevation="55"/>
+          </feDiffuseLighting>
+          <feComposite in="SourceGraphic" in2="d" operator="arithmetic" k1="1.3" result="m"/>
+          <feSpecularLighting in="n" surfaceScale="2" specularConstant=".35" specularExponent="28" lighting-color="#d6eadc" result="s">
+            <feDistantLight azimuth="235" elevation="40"/>
+          </feSpecularLighting>
+          <feColorMatrix in="s" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .45 0" result="sa"/>
+          <feComposite in="sa" in2="SourceAlpha" operator="in" result="s2"/>
+          <feComposite in="m" in2="SourceAlpha" operator="in" result="m2"/>
+          <feMerge><feMergeNode in="m2"/><feMergeNode in="s2"/></feMerge>
+        </filter>
+        <path id="eBodyShape" d="M 60 18 C 84 18, 104 52, 103 88 C 102 118, 84 142, 60 142 C 36 142, 18 118, 17 88 C 16 52, 36 18, 60 18 Z"/>
+        <clipPath id="eBodyClip"><use href="#eBodyShape"/></clipPath>
+        <!-- slides down while the lobes part, removing the closed crown -->
+        <clipPath id="eCut"><rect id="eCutRect" x="-10" y="0" width="140" height="170"/></clipPath>
       </defs>
-      <ellipse cx="60" cy="143" rx="42" ry="5" fill="#000" opacity=".55"/>
-      <g fill="none" stroke="#1e2216" stroke-width="3" stroke-linecap="round">
-        <path d="M 38 134 C 30 140, 20 142, 10 146"/>
-        <path d="M 82 134 C 92 140, 102 141, 112 146"/>
-        <path d="M 55 140 C 52 145, 46 148, 40 150"/>
+      <!-- base: shadow, root growths, floor mist -->
+      <ellipse cx="60" cy="144" rx="46" ry="5" fill="#000" opacity=".6"/>
+      <g fill="#0b0c08">
+                <path d="M 30 138 C 44 146, 76 146, 90 138 C 80 143, 40 143, 30 138 Z"/>
       </g>
-      <path id="eBack" d="M 44 42 C 46 28, 54 12, 60 10 C 66 12, 74 28, 76 42 Z" fill="url(#eShell)" stroke="#0d0f09" stroke-width="1"/>
-      <path d="M 33 42 C 18 60, 14 90, 18 108 C 23 128, 40 140, 60 140 C 80 140, 97 128, 102 108 C 106 90, 102 60, 87 42 C 78 47, 42 47, 33 42 Z"
-            fill="url(#eShell)" stroke="#0d0f09" stroke-width="1.2"/>
-      <g fill="none" stroke="#7d8160" stroke-width=".9" opacity=".35" stroke-linecap="round">
-        <path d="M 30 62 C 26 80, 28 100, 36 118"/>
-        <path d="M 46 52 C 40 74, 44 104, 52 128"/>
-        <path d="M 74 52 C 80 70, 78 96, 70 126"/>
-        <path d="M 90 60 C 96 78, 94 100, 86 118"/>
-        <path d="M 30 90 C 40 94, 50 92, 58 98 M 64 84 C 74 88, 84 86, 92 90"/>
-      </g>
-      <ellipse id="eVoid" cx="60" cy="42" rx="25" ry="8" fill="url(#eVoidG)"/>
-      <g clip-path="url(#eBodyClip)">
-        <g id="eHugger">
-          <path id="eTail" fill="none" stroke="#b9a87c" stroke-width="2.4" stroke-linecap="round"/>
-          <ellipse id="eHugBody" cx="60" cy="40" rx="13" ry="6" fill="url(#eHug)" stroke="#4a3f28" stroke-width="1"/>
-          <path id="eHugRibs" fill="none" stroke="#6f6040" stroke-width=".8"/>
+      <path id="eBack" d="M 47 44 C 49 30, 55 20, 60 18 C 65 20, 71 30, 73 44 Z" fill="url(#eShell)" stroke="#050504" stroke-width=".8" stroke-opacity=".55"/>
+      <ellipse id="eHalo" cx="60" cy="36" rx="30" ry="18" fill="url(#eHaloG)" opacity="0"/>
+      <g clip-path="url(#eCut)">
+        <g filter="url(#eSkin)">
+          <use href="#eBodyShape" fill="url(#eShell)"/>
+          <g id="eVeins" clip-path="url(#eBodyClip)" fill="none" stroke-linecap="round"></g>
+          <g fill="none" stroke-linecap="round">
+            <path d="M 46 46 C 41 56, 38 66, 37 79 M 74 46 C 79 56, 82 66, 83 79" stroke="#050504" stroke-width="1.2" opacity=".4"/>
+            <path d="M 45 46 C 40 56, 37 66, 36 79 M 75 46 C 80 56, 83 66, 84 79" stroke="#6d6c55" stroke-width=".6" opacity=".45"/>
+            <!-- closed crown: cross-shaped slit between the four lobes -->
+            <path d="M 60 19 C 54 26, 49 35, 47 46 M 60 19 C 66 26, 71 35, 73 46 M 60 19 C 59 26, 59 32, 60 36" stroke="#030302" stroke-width="1.3" opacity=".85"/>
+            <path d="M 59 20 C 53 27, 48 36, 46 46 M 59 20 C 58 27, 58 32, 59 36" stroke="#8e8d70" stroke-width=".5" opacity=".4"/>
+          </g>
         </g>
+        <use href="#eBodyShape" fill="none" stroke="url(#eRim)" stroke-width="1.6"/>
       </g>
-      <path id="eL" d="M 33 42 C 34 30, 46 20, 60 19 L 52 42 Z" fill="url(#eShell)" stroke="#0d0f09" stroke-width="1"/>
-      <path id="eR" d="M 87 42 C 86 30, 74 20, 60 19 L 68 42 Z" fill="url(#eShell)" stroke="#0d0f09" stroke-width="1"/>
-      <g id="eLegs" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
-      <path id="eF" d="M 45 43 L 60 19 L 75 43 C 69 47, 51 47, 45 43 Z" fill="url(#eShell)" stroke="#0d0f09" stroke-width="1"/>
+      <ellipse id="eVoid" cx="60" cy="43" rx="10" ry="1.5" fill="url(#eVoidG)"/>
+      <g id="eLobes" opacity="0">
+      <g id="eL" filter="url(#eSkin)">
+        <path d="M 27 44 C 28 31, 42 19, 58 18.3 L 60 18.6 C 55 27, 50 35, 47 47 C 39 48, 32 47, 27 44 Z" fill="url(#eShell)"/>
+        <path d="M 36 36 C 39 28, 45 23, 52 21" fill="none" stroke="#8a8a6c" stroke-width=".5" opacity=".3"/>
+      </g>
+      <g id="eR" filter="url(#eSkin)">
+        <path d="M 93 44 C 92 31, 78 19, 62 18.3 L 60 18.6 C 65 27, 70 35, 73 47 C 81 48, 88 47, 93 44 Z" fill="url(#eShell)"/>
+        <path d="M 84 36 C 81 28, 75 23, 68 21" fill="none" stroke="#8a8a6c" stroke-width=".6" opacity=".3"/>
+      </g>
+      <g id="eFingers" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+      <g id="eF" filter="url(#eSkin)">
+        <path d="M 46 47 C 48 35, 54 26, 60 19 C 66 26, 72 35, 74 47 C 67 50, 53 50, 46 47 Z" fill="url(#eShell)"/>
+        <path d="M 52 38 C 54 31, 57 25, 60 22" fill="none" stroke="#8f8f70" stroke-width=".5" opacity=".3"/>
+      </g>
+      </g>
+      <ellipse cx="60" cy="141" rx="58" ry="8" fill="url(#eMistG)"/>
     </svg>
     <span>ШТАМП</span></h1>
   <p>Изготовление печатей и штампов</p>
@@ -911,56 +948,79 @@ function flicker() {
   });
 }
 
-/* ---------- logo egg: petals open, facehugger crawls out ---------- */
+/* ---------- logo egg: lobes part, facehugger fingers feel over the rim ---------- */
 const E = { open: 0, out: 0, twitch: 0 };
-const eL = $('#eL'), eR = $('#eR'), eF = $('#eF'), eBack = $('#eBack'), eVoid = $('#eVoid'),
-      eHugger = $('#eHugger'), eHugBody = $('#eHugBody'), eHugRibs = $('#eHugRibs'), eTail = $('#eTail');
-const LEGS = [];
-for (const k of [3, 2, 1, 0]) for (const sgn of [-1, 1]) {
-  const g = $('#eLegs');
-  LEGS.push({ k, sgn,
-    under: el('path', { stroke: '#2b2416', 'stroke-width': 3.8 }, g),
-    top: el('path', { stroke: '#cdbd94', 'stroke-width': 2.2 }, g),
-    j1: el('circle', { r: 0, fill: '#e8dbb4' }, g),
-    j2: el('circle', { r: 0, fill: '#e8dbb4' }, g) });
+const eL = $('#eL'), eR = $('#eR'), eF = $('#eF'), eBack = $('#eBack'), eVoid = $('#eVoid'), eHalo = $('#eHalo'),
+      eLobes = $('#eLobes'), eCutRect = $('#eCutRect');
+
+// static organic veins: wandering, branching ridges rising from the base
+(() => {
+  const r = mulberry(23), g = $('#eVeins');
+  const vein = (x, y, ang, len, w, depth) => {
+    let d = `M ${x.toFixed(1)} ${y.toFixed(1)}`;
+    for (let i = 0; i < 6; i++) {
+      ang += (r() - .5) * .55;
+      const nx = x + Math.cos(ang) * len / 6, ny = y + Math.sin(ang) * len / 6;
+      d += ` Q ${(x + nx) / 2 + (r() - .5) * 7} ${(y + ny) / 2 + (r() - .5) * 3} ${nx.toFixed(1)} ${ny.toFixed(1)}`;
+      x = nx; y = ny;
+      if (depth < 1 && r() < .12) vein(x, y, ang + (r() < .5 ? -.45 : .45), len * .4, w * .65, depth + 1);
+    }
+    el('path', { d, stroke: '#050504', 'stroke-width': w + 1.4, opacity: .45, transform: 'translate(.5 .5)' }, g);
+    el('path', { d, stroke: '#3b3b2d', 'stroke-width': w + .6, opacity: .75 }, g);
+    el('path', { d, stroke: '#8d8e72', 'stroke-width': w * .3, opacity: .12, transform: 'translate(-.4 -.4)' }, g);
+  };
+  [[26, 126, -1.85], [40, 138, -1.72], [57, 142, -1.6], [72, 140, -1.48], [90, 130, -1.36], [18, 96, -1.5], [102, 94, -1.64]]
+    .forEach(([x, y, a]) => vein(x, y, a, 55 + r() * 40, 1.8 + r() * 1.2, 0));
+})();
+
+// facehugger fingers: long knuckled bone digits, only the tips come out
+const FINGERS = [];
+for (const [k, sgn] of [[1, -1], [0, -1], [0, 1], [1, 1]]) {
+  const g = $('#eFingers');
+  FINGERS.push({ k, sgn,
+    under: el('path', { stroke: '#0d0b07', 'stroke-width': 2.4, opacity: .85 }, g),
+    bone: el('path', { stroke: '#5f5b46', 'stroke-width': 1.3 }, g),
+    hi: el('path', { stroke: '#cfc8a8', 'stroke-width': .4, opacity: .35 }, g),
+    claw: el('path', { stroke: '#8f8a6e', 'stroke-width': .7 }, g),
+    knuckles: [0, 1].map(() => el('circle', { r: 0, fill: '#7c7660', stroke: '#14110b', 'stroke-width': .45 }, g)) });
 }
 const clamp01 = v => Math.max(0, Math.min(1, v));
 const lerpP = (a, b, t) => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
 const f1 = v => v.toFixed(1);
 
 function renderEgg() {
-  const t = performance.now() / 1000, o = E.open;
-  eL.setAttribute('transform', `rotate(${f1(-72 * o)} 35 42)`);
-  eR.setAttribute('transform', `rotate(${f1(72 * o)} 85 42)`);
-  eF.setAttribute('transform', `translate(0 44) scale(1 ${(1 - 1.75 * o).toFixed(3)}) translate(0 -44)`);
-  eBack.setAttribute('transform', `translate(0 42) scale(1 ${o.toFixed(3)}) translate(0 -42)`);
-  eVoid.setAttribute('rx', f1(12 + 13 * o));
-  eVoid.setAttribute('ry', f1(2 + 6 * o));
-  eVoid.setAttribute('opacity', (.7 + .3 * Math.sin(t * 2.4)).toFixed(2));
+  const t = performance.now() / 1000, o = E.open, parted = o > .005;
+  // closed: one seamless shell with a cross slit; once it parts, separate lobes take over the crown
+  eLobes.setAttribute('opacity', parted ? 1 : 0);
+  eCutRect.setAttribute('y', parted ? 44 : 0);
+  // side lobes peel outward and sag, like thick lips parting
+  eL.setAttribute('transform', `translate(27 44) rotate(${f1(-20 * o)}) scale(${(1 + .05 * o).toFixed(3)} ${(1 - .3 * o).toFixed(3)}) translate(-27 -44)`);
+  eR.setAttribute('transform', `translate(93 44) rotate(${f1(20 * o)}) scale(${(1 + .05 * o).toFixed(3)} ${(1 - .3 * o).toFixed(3)}) translate(-93 -44)`);
+  eF.setAttribute('transform', `translate(0 46) scale(1 ${(1 - .55 * o).toFixed(3)}) translate(0 -46)`);
+  eBack.setAttribute('transform', `translate(0 44) scale(1 ${(.6 * o).toFixed(3)}) translate(0 -44)`);
+  eVoid.setAttribute('rx', f1(10 + 12 * o));
+  eVoid.setAttribute('ry', f1(1 + 4.5 * o));
+  const pulse = .75 + .25 * Math.sin(t * 1.6);
+  eVoid.setAttribute('opacity', (clamp01(o * 2.5) * (.6 + .4 * pulse)).toFixed(2));
+  eHalo.setAttribute('opacity', (o * pulse * .8).toFixed(2));
 
-  const by = 50 - 18 * E.out;
-  eHugger.setAttribute('opacity', clamp01(o * 3 - .4).toFixed(2));
-  eHugBody.setAttribute('cy', f1(by));
-  eHugRibs.setAttribute('d', `M 50 ${f1(by - 2)} Q 60 ${f1(by - 5)} 70 ${f1(by - 2)} M 52 ${f1(by + 1)} Q 60 ${f1(by - 2)} 68 ${f1(by + 1)}`);
-  const te = clamp01((E.out - .5) * 2), w = Math.sin(t * 5) * 4 * te;
-  eTail.setAttribute('d', `M 60 ${f1(by)} C ${f1(60 + w)} ${f1(by - 14 * te)}, ${f1(72 + w)} ${f1(by - 26 * te)}, ${f1(66 + w * 1.5)} ${f1(by - 38 * te)}`);
-  eTail.setAttribute('opacity', te.toFixed(2));
-
-  // legs unfold segment by segment: over the rim, down the shell
-  LEGS.forEach(({ k, sgn, under, top, j1, j2 }) => {
-    const e = clamp01((E.out - k * .07) / .79);
-    if (e <= 0) { under.setAttribute('d', ''); top.setAttribute('d', ''); j1.setAttribute('r', 0); j2.setAttribute('r', 0); return; }
-    const tw = E.twitch * Math.sin(t * 9 + k * 1.7 + sgn);
-    const p0 = { x: 60 + sgn * 6, y: by };
-    const p1o = { x: 60 + sgn * (14 + k * 4), y: 30 - k * 3 };
-    const p2o = { x: 60 + sgn * (28 + k * 5), y: 38 + k * 4 };
-    const p3o = { x: 60 + sgn * (32 + k * 5 + tw * 1.5), y: 56 + k * 10 + tw * 1.2 };
-    const e2 = clamp01(e * 3 - 1);
-    const p1 = lerpP(p0, p1o, clamp01(e * 3)), p2 = lerpP(p1, p2o, e2), p3 = lerpP(p2, p3o, clamp01(e * 3 - 2));
-    const d = `M ${f1(p0.x)} ${f1(p0.y)} L ${f1(p1.x)} ${f1(p1.y)} L ${f1(p2.x)} ${f1(p2.y)} L ${f1(p3.x)} ${f1(p3.y)}`;
-    under.setAttribute('d', d); top.setAttribute('d', d);
-    j1.setAttribute('cx', f1(p1.x)); j1.setAttribute('cy', f1(p1.y)); j1.setAttribute('r', 1.5);
-    j2.setAttribute('cx', f1(p2.x)); j2.setAttribute('cy', f1(p2.y)); j2.setAttribute('r', e2 > 0 ? 1.5 : 0);
+  FINGERS.forEach(({ k, sgn, under, bone, hi, claw, knuckles }) => {
+    const e = clamp01((E.out - k * .15) / .85);
+    if (e <= 0) { [under, bone, hi, claw].forEach(p => p.setAttribute('d', '')); knuckles.forEach(c => c.setAttribute('r', 0)); return; }
+    const tw = E.twitch * Math.sin(t * 8 + k * 2.1 + sgn * 1.3);
+    const p0 = { x: 60 + sgn * (3 + k * 4), y: 45 };
+    const p1o = { x: 60 + sgn * (9 + k * 7), y: 29 - k * 2 + tw * .6 };
+    const p2o = { x: 60 + sgn * (18 + k * 8 + tw), y: 32 + k * 3 };
+    const p3o = { x: 60 + sgn * (21 + k * 8 + tw * 1.4), y: 41 + k * 5 + tw };
+    const e1 = clamp01(e * 2.4), e2 = clamp01(e * 2.4 - .8), e3 = clamp01(e * 2.4 - 1.4);
+    const p1 = lerpP(p0, p1o, e1), p2 = lerpP(p1, p2o, e2), p3 = lerpP(p2, p3o, e3);
+    const d = `M ${f1(p0.x)} ${f1(p0.y)} Q ${f1(p0.x + sgn)} ${f1((p0.y + p1.y) / 2)} ${f1(p1.x)} ${f1(p1.y)} ` +
+              `L ${f1(p2.x)} ${f1(p2.y)} L ${f1(p3.x)} ${f1(p3.y)}`;
+    under.setAttribute('d', d); bone.setAttribute('d', d);
+    hi.setAttribute('d', d); hi.setAttribute('transform', `translate(${-.4 * sgn} -.4)`);
+    claw.setAttribute('d', e3 > .6 ? `M ${f1(p3.x)} ${f1(p3.y)} q ${f1(-sgn * 1.2)} 2.2 ${f1(-sgn * 2.6)} 2.4` : '');
+    knuckles[0].setAttribute('cx', f1(p1.x)); knuckles[0].setAttribute('cy', f1(p1.y)); knuckles[0].setAttribute('r', e1 > .3 ? .95 : 0);
+    knuckles[1].setAttribute('cx', f1(p2.x)); knuckles[1].setAttribute('cy', f1(p2.y)); knuckles[1].setAttribute('r', e2 > .3 ? .8 : 0);
   });
 }
 gsap.ticker.add(renderEgg);
@@ -970,13 +1030,13 @@ function hatch() {
   if (hatching || reduced) return;
   hatching = true;
   gsap.timeline({ onComplete: () => { hatching = false; } })
-    .to(E, { open: .12, duration: .14, ease: 'power1.inOut', yoyo: true, repeat: 3 })
-    .to(E, { open: 1, duration: 1, ease: 'power2.out' })
-    .to(E, { out: 1, duration: 1.6, ease: 'power1.inOut' }, '-=.35')
-    .to(E, { twitch: 1, duration: .3 }, '-=.6')
-    .to(E, { twitch: 0, duration: .4 }, '+=2.2')
-    .to(E, { out: 0, duration: .7, ease: 'power3.in' })
-    .to(E, { open: 0, duration: .6, ease: 'power2.inOut' }, '-=.15');
+    .to(E, { open: .15, duration: .18, ease: 'power1.inOut', yoyo: true, repeat: 3 })
+    .to(E, { open: 1, duration: 1.3, ease: 'power2.out' })
+    .to(E, { out: 1, duration: 1.5, ease: 'power1.inOut' }, '-=.5')
+    .to(E, { twitch: 1, duration: .3 }, '-=.4')
+    .to(E, { twitch: 0, duration: .4 }, '+=1.8')
+    .to(E, { out: 0, duration: .55, ease: 'power3.in' })
+    .to(E, { open: 0, duration: .8, ease: 'power2.inOut' }, '-=.1');
 }
 function hatchLoop() { gsap.delayedCall(rand(5, 9), () => { hatch(); hatchLoop(); }); }
 $('#egg').addEventListener('click', hatch);
