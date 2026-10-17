@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ALIEN ШТАМП — прототип 2</title>
+<title>ALIEN ШТАМП — изготовление печатей и штампов</title>
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -16,39 +17,41 @@
     --term: #8fd16a;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; background: var(--void); overflow: hidden; color: var(--bone); font-family: 'IBM Plex Mono', monospace; }
+  html { scroll-behavior: smooth; scrollbar-width: none; }
+  body::-webkit-scrollbar { width: 0; height: 0; }
+  html, body { height: 100%; background: var(--void); overflow-x: hidden; color: var(--bone); font-family: 'IBM Plex Mono', monospace; }
 
-  .layer { position: fixed; inset: 0; width: 100%; height: 100%; }
-  #bg { position: fixed; left: 0; top: 0; max-width: none; will-change: transform; }
+  .layer { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #bg { position: absolute; left: 0; top: 0; max-width: none; will-change: transform; }
   #bgShade { pointer-events: none;
     background:
       linear-gradient(180deg, rgba(1,5,3,.55) 0%, transparent 30%),
       linear-gradient(180deg, transparent 55%, rgba(1,5,3,.7) 100%),
       radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(1,8,5,.55) 100%); }
-  #shake { position: fixed; inset: 0; }
+  #shake { position: absolute; inset: 0; }
   #world { cursor: crosshair; }
   #fg { pointer-events: none; }
 
-  .fog { position: fixed; inset: -20%; pointer-events: none; mix-blend-mode: screen; opacity: .22;
+  .fog { position: absolute; inset: -20%; pointer-events: none; mix-blend-mode: screen; opacity: .22;
     background:
       radial-gradient(ellipse 45% 14% at 35% 50%, rgba(110,200,140,.35), transparent 70%),
       radial-gradient(ellipse 40% 12% at 72% 46%, rgba(90,170,120,.3), transparent 70%);
     animation: drift 26s ease-in-out infinite alternate; }
   .fog.b { animation-duration: 38s; animation-direction: alternate-reverse; opacity: .16; }
   @keyframes drift { from { transform: translate3d(-4%,2%,0); } to { transform: translate3d(5%,-3%,0); } }
-  #pulse { position: fixed; inset: 0; pointer-events: none; mix-blend-mode: screen;
+  #pulse { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
     background: radial-gradient(ellipse 22% 24% at 55% 38%, rgba(120,220,150,.12), transparent 70%);
     animation: breathe 6s ease-in-out infinite; }
   @keyframes breathe { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
 
-  #scan { position: fixed; inset: 0; pointer-events: none; opacity: .45; mix-blend-mode: multiply;
+  #scan { position: absolute; inset: 0; pointer-events: none; opacity: .45; mix-blend-mode: multiply;
     background: repeating-linear-gradient(0deg, rgba(0,0,0,.2) 0 1px, transparent 1px 3px); }
-  #vignette { position: fixed; inset: 0; pointer-events: none;
+  #vignette { position: absolute; inset: 0; pointer-events: none;
     background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(0,0,0,.78) 100%); }
-  #dim { position: fixed; inset: 0; pointer-events: none; background: #000; opacity: 0; }
-  #blackout { position: fixed; inset: 0; background: #000; z-index: 50; pointer-events: none; }
+  #dim { position: absolute; inset: 0; pointer-events: none; background: #000; opacity: 0; }
+  #blackout { position: absolute; inset: 0; background: #000; z-index: 50; pointer-events: none; }
 
-  .ui { position: fixed; z-index: 20; }
+  .ui { position: absolute; z-index: 20; }
 
   #brand { top: 4.5vh; right: 4vw; text-align: right; }
   #brand h1 { display: flex; align-items: center; justify-content: flex-end; gap: .12em;
@@ -130,9 +133,113 @@
     background: rgba(3,8,5,.6); border: 1px solid #23362a; transition: .3s; }
   .btn:hover { border-color: var(--accent); color: #e4efe2; box-shadow: 0 0 30px rgba(127,199,150,.2); }
   .btn.ghost { color: var(--bone-dim); padding: 18px 20px 17px 24px; }
+
+  /* ===== landing: the scene occupies the first viewport, content scrolls below ===== */
+  #scene { position: relative; height: 100vh; overflow: hidden; }
+  #scrollHint { position: absolute; bottom: 2.2vh; left: 50%; transform: translateX(-50%); z-index: 21;
+    font-size: 10px; letter-spacing: .4em; color: var(--bone-dim); text-decoration: none; white-space: nowrap;
+    animation: hintPulse 2.4s ease-in-out infinite; }
+  #scrollHint:hover { color: var(--accent); }
+  @keyframes hintPulse { 0%, 100% { opacity: .4; transform: translateX(-50%) translateY(0); }
+    50% { opacity: 1; transform: translateX(-50%) translateY(6px); } }
+
+  main#page { position: relative; z-index: 30;
+    background: linear-gradient(180deg, rgba(1,4,3,0) 0, rgba(1,4,3,.92) 160px, #010403 320px); }
+  .sec { padding: 100px 6vw 50px; }
+  .sec-in { max-width: 1120px; margin: 0 auto; }
+  .sec-no { font-size: 11px; letter-spacing: .4em; color: var(--accent); opacity: .8; margin-bottom: 16px; }
+  .sec h2 { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: clamp(20px, 2.6vw, 34px);
+    letter-spacing: .14em; text-transform: uppercase; line-height: 1.4; margin-bottom: 46px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .card { position: relative; padding: 26px 24px 22px; border: 1px solid #1d2c22; transition: .3s;
+    background: linear-gradient(160deg, rgba(10,20,14,.85), rgba(3,7,5,.92));
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%); }
+  .card:hover { border-color: #34503d; box-shadow: 0 0 30px rgba(127,199,150,.08); }
+  .card .stamp { display: block; width: 86px; height: 86px; margin-bottom: 16px; }
+  .card h3 { font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 13px;
+    letter-spacing: .18em; text-transform: uppercase; margin-bottom: 10px; }
+  .price { font-family: 'Unbounded', sans-serif; font-weight: 300; font-size: 22px;
+    color: var(--accent); letter-spacing: .08em; margin-bottom: 8px; }
+  .meta { font-size: 10.5px; line-height: 1.8; letter-spacing: .08em; color: var(--bone-dim); margin-bottom: 18px; }
+  .card-btn { display: inline-block; font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
+    color: var(--bone); text-decoration: none; border: 1px solid #23362a; padding: 10px 18px; transition: .25s; }
+  .card-btn:hover { border-color: var(--accent); color: #e4efe2; box-shadow: 0 0 20px rgba(127,199,150,.15); }
+  .note { margin-top: 28px; font-size: 11px; line-height: 1.9; letter-spacing: .06em; color: var(--bone-dim); max-width: 660px; }
+
+  #galGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; }
+  .tile { position: relative; aspect-ratio: 1 / 1.1; padding: 9%; overflow: hidden; border: 1px solid #1d2c22;
+    background: linear-gradient(155deg, #181d16, #090d09); }
+  .tile::before { content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 40% 28%, rgba(205,195,165,.12), transparent 62%); }
+  .tile svg { width: 100%; height: 82%; }
+  .tile span { position: absolute; left: 12px; bottom: 10px; font-size: 9px;
+    letter-spacing: .25em; color: var(--bone-dim); text-transform: uppercase; }
+
+  .steps { border: 1px solid #1d2c22; background: rgba(3,7,5,.9); counter-reset: st; }
+  .step { display: flex; gap: 26px; align-items: baseline; padding: 24px 28px; border-bottom: 1px solid #14211a; }
+  .step:last-child { border-bottom: 0; }
+  .step::before { counter-increment: st; content: '0' counter(st);
+    font-family: 'Unbounded', sans-serif; font-size: 16px; color: var(--accent); flex-shrink: 0; }
+  .step b { display: block; font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 12px;
+    letter-spacing: .2em; text-transform: uppercase; margin-bottom: 7px; }
+  .step p { font-size: 11px; line-height: 1.85; letter-spacing: .06em; color: var(--bone-dim); }
+
+  .order-wrap { display: grid; grid-template-columns: 1.15fr .85fr; gap: 26px; align-items: start; }
+  .fld { margin-bottom: 20px; }
+  .fld label { display: block; font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
+    color: var(--bone-dim); margin-bottom: 10px; }
+  .fld input, .fld textarea { width: 100%; background: rgba(3,8,5,.7); border: 1px solid #1d2c22;
+    color: var(--bone); font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .04em;
+    padding: 13px 14px; transition: .25s; }
+  .fld input:focus, .fld textarea:focus { outline: none; border-color: var(--accent);
+    box-shadow: 0 0 18px rgba(127,199,150,.1); }
+  .fld textarea { min-height: 88px; resize: vertical; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips .opt { font-size: 10px; padding: 11px 14px 10px; }
+  .ticket { position: sticky; top: 24px; padding: 28px 26px 24px; border: 1px solid #23362a;
+    background: linear-gradient(160deg, rgba(16,30,21,.92), rgba(4,9,6,.96)); }
+  .ticket h4 { font-family: 'Unbounded', sans-serif; font-size: 11px; letter-spacing: .3em;
+    color: var(--accent); margin-bottom: 16px; }
+  .ticket dl { font-size: 11px; line-height: 2.1; letter-spacing: .06em; overflow: hidden; }
+  .ticket dt { float: left; margin-right: 10px; color: var(--bone-dim); }
+  .ticket dd { color: var(--bone); word-break: break-word; }
+  .ticket .send { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+  .ticket .send button { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .22em;
+    text-transform: uppercase; padding: 14px; cursor: pointer; color: var(--bone);
+    background: rgba(3,8,5,.6); border: 1px solid #23362a; transition: .25s; }
+  .ticket .send button:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(127,199,150,.15); }
+  .ticket .send #sendWa { border-color: #2c5c3a; }
+  .ticket .send #sendTg { border-color: #26485e; }
+  .ticket .hint { margin-top: 14px; font-size: 9px; line-height: 1.8; letter-spacing: .1em; color: var(--bone-dim); }
+
+  .c-link { display: block; text-decoration: none; color: var(--bone); padding: 24px 26px; transition: .25s;
+    border: 1px solid #1d2c22; background: linear-gradient(160deg, rgba(10,20,14,.85), rgba(3,7,5,.92));
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%); }
+  .c-link:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,.5); }
+  .c-link .net { display: block; font-family: 'Unbounded', sans-serif; font-size: 12px;
+    letter-spacing: .25em; text-transform: uppercase; color: var(--accent); margin-bottom: 9px; }
+  .c-link .val { font-size: 13px; letter-spacing: .08em; }
+  footer { position: relative; z-index: 30; padding: 60px 6vw 46px; text-align: center;
+    font-size: 10px; letter-spacing: .34em; text-transform: uppercase; color: #35443b; }
+
+  .rv { opacity: 0; transform: translateY(34px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
+  .rv.vis { opacity: 1; transform: none; }
+
+  @media (max-width: 860px) {
+    .order-wrap { grid-template-columns: 1fr; }
+    .ticket { position: static; }
+    .sec { padding: 70px 5vw 36px; }
+    #scrollHint { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rv { opacity: 1; transform: none; transition: none; }
+    #scrollHint { animation: none; }
+  }
 </style>
 </head>
 <body>
+
+<section id="scene">
 
 <!-- ===== BACKGROUND: derelict ship corridor ===== -->
 <img id="bg" src="bg.png" alt="">
@@ -440,7 +547,163 @@
   <button class="btn" id="stampBtn">Поставить печать</button>
 </div>
 
+<a id="scrollHint" href="#services">▼ УСЛУГИ · ЦЕНЫ · ЗАКАЗ ▼</a>
 <div id="blackout"></div>
+
+</section>
+
+<!-- ================= LANDING CONTENT ================= -->
+<main id="page">
+
+  <!-- 01 services / prices -->
+  <section class="sec" id="services"><div class="sec-in">
+    <div class="sec-no">// 01 · УСЛУГИ И ЦЕНЫ</div>
+    <h2>Печати и штампы<br>за 1–2 дня</h2>
+    <div class="grid">
+      <div class="card rv">
+        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="round" data-ink="#2b3a95"></svg>
+        <h3>Круглая печать</h3>
+        <div class="price">от 800 ₽</div>
+        <div class="meta">Для ИП и ООО · срок 1 рабочий день · оснастка в комплекте</div>
+        <a class="card-btn" href="#order" data-otype="round">Заказать</a>
+      </div>
+      <div class="card rv">
+        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="rect" data-ink="#8c1a12"></svg>
+        <h3>Прямоугольный штамп</h3>
+        <div class="price">от 600 ₽</div>
+        <div class="meta">Утверждаю, копия верна, реквизиты · срок 1 рабочий день</div>
+        <a class="card-btn" href="#order" data-otype="rect">Заказать</a>
+      </div>
+      <div class="card rv">
+        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="tri" data-ink="#2b3a95"></svg>
+        <h3>Треугольная печать</h3>
+        <div class="price">от 900 ₽</div>
+        <div class="meta">Для документов и внутреннего пользования · срок 1 рабочий день</div>
+        <a class="card-btn" href="#order" data-otype="tri">Заказать</a>
+      </div>
+      <div class="card rv">
+        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="round" data-ink="#8c1a12"></svg>
+        <h3>Факсимиле</h3>
+        <div class="price">от 1200 ₽</div>
+        <div class="meta">Печать вашей подписи · по скану или фото · 1–2 дня</div>
+        <a class="card-btn" href="#order" data-otype="fac">Заказать</a>
+      </div>
+      <div class="card rv">
+        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="rect" data-ink="#2b3a95"></svg>
+        <h3>Датер и нумератор</h3>
+        <div class="price">от 1000 ₽</div>
+        <div class="meta">Автоматическая дата и нумерация · срок 1–2 дня</div>
+        <a class="card-btn" href="#order" data-otype="dater">Заказать</a>
+      </div>
+      <div class="card rv">
+        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="tri" data-ink="#8c1a12"></svg>
+        <h3>Оснастка и заправка</h3>
+        <div class="price">от 300 ₽</div>
+        <div class="meta">Замена оснастки, штемпельная подушка, чернила</div>
+        <a class="card-btn" href="#order" data-otype="other">Заказать</a>
+      </div>
+    </div>
+    <p class="note">Цены ориентировочные — зависят от оснастки и сложности макета.
+      Срочное изготовление в день обращения — +50% к стоимости. Бесплатный эскиз оттиска до оплаты.</p>
+  </div></section>
+
+  <!-- 02 gallery -->
+  <section class="sec" id="gallery"><div class="sec-in">
+    <div class="sec-no">// 02 · ОТТИСКИ</div>
+    <h2>Примеры работ</h2>
+    <div class="grid" id="galGrid">
+      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="round" data-ink="#2b3a95"></svg><span>печать ООО</span></div>
+      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="rect" data-ink="#8c1a12"></svg><span>утверждаю</span></div>
+      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="tri" data-ink="#2b3a95"></svg><span>для документов</span></div>
+      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="round" data-ink="#8c1a12"></svg><span>печать ИП</span></div>
+      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="rect" data-ink="#2b3a95"></svg><span>копия верна</span></div>
+      <div class="tile rv"><svg viewBox="-80 -80 160 160" data-shape="tri" data-ink="#8c1a12"></svg><span>внутреннее пользование</span></div>
+    </div>
+    <p class="note">Оттиски сгенерированы тем же «механизмом», что ставит ксеноморф наверху — замените на фото реальных работ, когда будут готовы.</p>
+  </div></section>
+
+  <!-- 03 steps -->
+  <section class="sec" id="steps"><div class="sec-in">
+    <div class="sec-no">// 03 · ПРОЦЕДУРА</div>
+    <h2>Как заказать</h2>
+    <div class="steps">
+      <div class="step rv"><div><b>Заявка</b><p>Заполните форму ниже или напишите в мессенджер — пришлите текст и реквизиты для печати.</p></div></div>
+      <div class="step rv"><div><b>Макет</b><p>В течение 30 минут присылаем бесплатный эскиз оттиска. Согласуем и подтверждаем заказ.</p></div></div>
+      <div class="step rv"><div><b>Изготовление</b><p>Стандартно — 1–2 рабочих дня. Срочный заказ — в день обращения, примерно 2 часа.</p></div></div>
+      <div class="step rv"><div><b>Получение</b><p>Самовывоз из мастерской, доставка по городу или отправка почтой в любой регион.</p></div></div>
+    </div>
+  </div></section>
+
+  <!-- 04 order form -->
+  <section class="sec" id="order"><div class="sec-in">
+    <div class="sec-no">// 04 · ОФОРМЛЕНИЕ ЗАКАЗА</div>
+    <h2>Оставить заявку</h2>
+    <div class="order-wrap">
+      <form id="orderForm" onsubmit="return false">
+        <div class="fld">
+          <label>Форма</label>
+          <div class="chips" id="otype">
+            <button class="opt on" data-otype="round">Круглая</button>
+            <button class="opt" data-otype="rect">Прямоугольная</button>
+            <button class="opt" data-otype="tri">Треугольная</button>
+            <button class="opt" data-otype="fac">Факсимиле</button>
+            <button class="opt" data-otype="dater">Датер</button>
+            <button class="opt" data-otype="other">Другое</button>
+          </div>
+        </div>
+        <div class="fld">
+          <label for="oText">Текст на печати</label>
+          <textarea id="oText" placeholder="Например: ООО «НОСТРОМО» · ОГРН 0000000000000 · ИНН 0000000000"></textarea>
+        </div>
+        <div class="fld">
+          <label for="oName">Имя / организация</label>
+          <input id="oName" type="text" placeholder="Как к вам обращаться">
+        </div>
+        <div class="fld">
+          <label for="oPhone">Телефон или Telegram</label>
+          <input id="oPhone" type="text" placeholder="+7 ___ ___-__-__ или @username">
+        </div>
+        <div class="fld">
+          <label for="oComm">Комментарий</label>
+          <textarea id="oComm" placeholder="Сроки, оснастка, доставка — любые детали"></textarea>
+        </div>
+      </form>
+      <aside class="ticket rv">
+        <h4>// ВАША ЗАЯВКА</h4>
+        <dl>
+          <dt>ФОРМА:</dt><dd id="tType">Круглая печать</dd>
+          <dt>ТЕКСТ:</dt><dd id="tText">—</dd>
+          <dt>ИМЯ:</dt><dd id="tName">—</dd>
+          <dt>КОНТАКТ:</dt><dd id="tPhone">—</dd>
+          <dt>ДЕТАЛИ:</dt><dd id="tComm">—</dd>
+        </dl>
+        <div class="send">
+          <button id="sendWa" type="button">Отправить в WhatsApp</button>
+          <button id="sendTg" type="button">Отправить в Telegram</button>
+          <button id="copyBtn" type="button">Скопировать текст заявки</button>
+        </div>
+        <div class="hint" id="sendHint">Заявка формируется текстом — вы увидите его в чате до отправки.</div>
+      </aside>
+    </div>
+  </div></section>
+
+  <!-- 05 contacts -->
+  <section class="sec" id="contacts"><div class="sec-in">
+    <div class="sec-no">// 05 · СВЯЗЬ</div>
+    <h2>Контакты</h2>
+    <div class="grid">
+      <a class="c-link rv" href="tel:+70000000000"><span class="net">Телефон</span><span class="val">+7 (000) 000-00-00</span></a>
+      <a class="c-link rv" href="https://t.me/alien_stamp" target="_blank" rel="noopener"><span class="net">Telegram</span><span class="val">@alien_stamp</span></a>
+      <a class="c-link rv" href="https://wa.me/70000000000" target="_blank" rel="noopener"><span class="net">WhatsApp</span><span class="val">+7 (000) 000-00-00</span></a>
+      <a class="c-link rv" href="https://vk.com/alien_stamp" target="_blank" rel="noopener"><span class="net">VK</span><span class="val">vk.com/alien_stamp</span></a>
+    </div>
+    <p class="note">г. Санкт-Петербург · мастерская: адрес уточняется · пн–пт 10:00–19:00.
+      Самовывоз, доставка по городу и почтой по всей России.</p>
+  </div></section>
+
+</main>
+
+<footer>ALIEN ШТАМП · ИЗГОТОВЛЕНИЕ ПЕЧАТЕЙ И ШТАМПОВ · 2026</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script>
@@ -1064,6 +1327,67 @@ if (reduced) {
     .add(hatch, 1.8)
     .add(() => { idle(); flicker(); hatchLoop(); }, 6);
 }
+
+/* ---------- landing: generated sample imprints ---------- */
+document.querySelectorAll('svg[data-shape]').forEach(svg => {
+  const g = el('g', { transform: `rotate(${rand(-9, 9)})`, opacity: rand(.8, .95) }, svg);
+  const inner = el('g', { filter: `url(#inkF${Math.floor(Math.random() * INK_FILTERS)})`,
+    fill: 'none', stroke: svg.dataset.ink }, g);
+  SHAPES[svg.dataset.shape](inner, svg.dataset.ink, 'g' + Math.floor(Math.random() * 1e6));
+});
+
+/* ---------- order form ---------- */
+const OTYPE_LABEL = { round: 'Круглая печать', rect: 'Прямоугольный штамп', tri: 'Треугольная печать',
+  fac: 'Факсимиле', dater: 'Датер/нумератор', other: 'Другое' };
+const ORDER_PHONE = '70000000000'; // замените на свой номер для WhatsApp
+const ORDER_TG = 'https://t.me/alien_stamp'; // замените на свой аккаунт
+const oType = $('#otype'), oName = $('#oName'), oPhone = $('#oPhone'), oText = $('#oText'), oComm = $('#oComm');
+const oForm = { type: 'round' };
+
+oType.querySelectorAll('.opt').forEach(b => b.addEventListener('click', e => {
+  e.preventDefault();
+  oType.querySelectorAll('.opt').forEach(x => x.classList.toggle('on', x === b));
+  oForm.type = b.dataset.otype;
+  updTicket();
+}));
+document.querySelectorAll('.card-btn[data-otype]').forEach(a => a.addEventListener('click', () => {
+  const b = oType.querySelector(`[data-otype="${a.dataset.otype}"]`);
+  if (b) b.click();
+}));
+
+function orderText() {
+  return `ЗАЯВКА — ALIEN ШТАМП\nТип: ${OTYPE_LABEL[oForm.type]}\nТекст на печати: ${oText.value || '—'}\n` +
+    `Комментарий: ${oComm.value || '—'}\nИмя: ${oName.value || '—'}\nКонтакт: ${oPhone.value || '—'}`;
+}
+function updTicket() {
+  $('#tType').textContent = OTYPE_LABEL[oForm.type];
+  $('#tText').textContent = oText.value || '—';
+  $('#tName').textContent = oName.value || '—';
+  $('#tPhone').textContent = oPhone.value || '—';
+  $('#tComm').textContent = oComm.value || '—';
+}
+[oName, oPhone, oText, oComm].forEach(i => i.addEventListener('input', updTicket));
+updTicket();
+
+function sendHint(msg) { $('#sendHint').textContent = msg; }
+$('#sendWa').addEventListener('click', () => {
+  window.open(`https://wa.me/${ORDER_PHONE}?text=${encodeURIComponent(orderText())}`, '_blank');
+});
+$('#sendTg').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(orderText()); sendHint('Заявка скопирована — вставьте текст в чат Telegram.'); }
+  catch (e) { sendHint('Скопируйте текст кнопкой ниже и вставьте в чат.'); }
+  window.open(ORDER_TG, '_blank');
+});
+$('#copyBtn').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(orderText()); sendHint('Текст заявки скопирован в буфер.'); }
+  catch (e) { sendHint('Не удалось скопировать — выделите заявку вручную.'); }
+});
+
+/* ---------- reveal on scroll ---------- */
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); }
+}), { threshold: .15 });
+document.querySelectorAll('.rv').forEach(n => io.observe(n));
 </script>
 </body>
 </html>
