@@ -256,23 +256,28 @@
   #manualModal { position: fixed; inset: 0; z-index: 80; display: none; align-items: center; justify-content: center;
     background: rgba(1,4,3,.84); backdrop-filter: blur(3px); }
   #manualModal.open { display: flex; }
-  .mm-panel { width: min(900px, 92vw); max-height: 86vh; overflow-y: auto; padding: 28px 32px 26px;
-    border: 1px solid #2f4a38;
-    background: linear-gradient(160deg, #0c150f, #030705);
-    box-shadow: 0 40px 90px rgba(0,0,0,.85), inset 0 0 40px rgba(127,199,150,.04);
+  .mm-frame { width: min(960px, 94vw); max-height: 88vh; padding: 1px;
+    background: #2f4a38;
+    box-shadow: 0 40px 90px rgba(0,0,0,.85);
     clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%); }
+  .mm-panel { max-height: calc(88vh - 2px); overflow-y: auto; padding: 26px 30px 24px;
+    background: linear-gradient(160deg, #0c150f, #030705);
+    clip-path: polygon(0 0, calc(100% - 21px) 0, 100% 21px, 100% 100%, 0 100%); }
   .mm-hd { display: flex; justify-content: space-between; align-items: center; gap: 16px;
     margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid #1d2c22;
     font-size: 11px; letter-spacing: .3em; color: var(--accent); text-transform: uppercase; }
   #mmClose { flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .22em;
     color: var(--bone-dim); background: none; border: 1px solid #23362a; padding: 9px 14px; cursor: pointer; transition: .25s; }
   #mmClose:hover { color: var(--bone); border-color: var(--accent); box-shadow: 0 0 16px rgba(127,199,150,.15); }
-  .comic { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .comic .frame { aspect-ratio: 16/10; display: flex; flex-direction: column; gap: 8px;
-    align-items: center; justify-content: center; border: 1px dashed #2f4a38;
-    background: rgba(3,8,5,.5); color: var(--bone-dim); font-size: 10px; letter-spacing: .3em; }
-  .comic .frame span { font-size: 8px; letter-spacing: .2em; opacity: .6; }
-  .mm-note { margin-top: 20px; font-size: 10px; line-height: 1.9; letter-spacing: .08em; color: var(--bone-dim); }
+  .mm-slide img { display: block; width: 100%; border: 1px solid #1d2c22; }
+  .mm-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+  .mm-nav button { display: inline-flex; align-items: center; justify-content: center;
+    width: 46px; height: 38px; color: var(--accent);
+    background: none; border: 1px solid #23362a; cursor: pointer; transition: .25s;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px)); }
+  .mm-nav button:hover { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 14px rgba(127,199,150,.15); }
+  .mm-nav button.hidden { visibility: hidden; }
+  .mm-cnt { font-size: 10px; letter-spacing: .3em; color: var(--accent); min-width: 56px; text-align: center; }
   @media (max-width: 700px) { .comic { grid-template-columns: 1fr; } }
 
   .rv { opacity: 0; transform: translateY(34px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
@@ -444,7 +449,7 @@
               <rect x="-68" y="-46" width="142" height="16" fill="#2a2d20"/>
               <text x="3" y="-35" text-anchor="middle" font-family="IBM Plex Mono" font-weight="500" font-size="8" letter-spacing="3" fill="#c8d4b8">ALIEN ШТАМП</text>
               <text x="3" y="-8" text-anchor="middle" font-family="Unbounded" font-weight="700" font-size="12.5" letter-spacing="1.6" fill="#2b2418">ИНСТРУКЦИЯ</text>
-              <text x="3" y="13" text-anchor="middle" font-family="IBM Plex Mono" font-weight="500" font-size="8.5" letter-spacing="1.4" fill="#4e4332">КАК ВЫБРАТЬ ОСНАСТКУ</text>
+              <text x="3" y="13" text-anchor="middle" font-family="IBM Plex Mono" font-weight="700" font-size="9.5" letter-spacing=".8" fill="#3a3021">ПО ВЫБОРУ ОСНАСТКИ</text>
             </g>
             <!-- grime/wear scratches -->
             <path d="M -60 52 L -28 56 M 30 -58 L 52 -55" stroke="#1b1f15" stroke-width="1.2" opacity=".6"/>
@@ -462,10 +467,9 @@
       <!-- un-foreshortened HUD callout above the book so user clearly sees it's clickable -->
       <g id="jCallout" transform="translate(0 -66)">
         <g id="jArrow">
-          <g id="jBadge">
-            <rect x="-88" y="-18" width="176" height="26" rx="2" fill="rgba(6,16,10,.88)" stroke="#4c8c62" stroke-width="1.2"/>
-            <circle cx="-73" cy="-5" r="3.5" fill="#8ef07a"/>
-            <text x="6" y="-1" text-anchor="middle" font-family="IBM Plex Mono" font-weight="500" font-size="10" letter-spacing="2.2" fill="#d6ead9">ЧИТАТЬ ИНСТРУКЦИЮ</text>
+          <g id="jBadge" transform="rotate(3.5 0 -5)">
+            <rect x="-78" y="-18" width="156" height="26" rx="2" fill="rgba(6,16,10,.88)" stroke="#4c8c62" stroke-width="1.2"/>
+            <text x="0" y="-1" text-anchor="middle" font-family="IBM Plex Mono" font-weight="500" font-size="10" letter-spacing="2.2" fill="#d6ead9">ЧИТАТЬ ИНСТРУКЦИЮ</text>
           </g>
           <path d="M 0 10 L 0 26 M -5 20 L 0 27 L 5 20" fill="none" stroke="#8ef07a" stroke-width="1.5" stroke-linecap="round"/>
         </g>
@@ -884,19 +888,18 @@
 
 <footer>ALIEN ШТАМП · ИЗГОТОВЛЕНИЕ ПЕЧАТЕЙ И ШТАМПОВ · 2026</footer>
 
-<!-- instruction manual modal (comic placeholder) -->
+<!-- instruction manual modal -->
 <div id="manualModal" role="dialog" aria-label="Инструкция по выбору оснастки">
-  <div class="mm-panel">
-    <div class="mm-hd"><span>// ИНСТРУКЦИЯ — ВЫБОР ОСНАСТКИ</span><button id="mmClose" type="button">✕ ЗАКРЫТЬ</button></div>
-    <div class="comic">
-      <div class="frame">КАДР 01<span>— место под иллюстрацию —</span></div>
-      <div class="frame">КАДР 02<span>— место под иллюстрацию —</span></div>
-      <div class="frame">КАДР 03<span>— место под иллюстрацию —</span></div>
-      <div class="frame">КАДР 04<span>— место под иллюстрацию —</span></div>
+  <div class="mm-frame">
+    <div class="mm-panel">
+      <div class="mm-hd"><span>// ИНСТРУКЦИЯ — ВЫБОР ОСНАСТКИ</span><button id="mmClose" type="button">✕ ЗАКРЫТЬ</button></div>
+      <div class="mm-slide"><img id="mmImg" src="manual-1.jpg" alt="Инструкция — слайд 1"></div>
+      <div class="mm-nav">
+        <button id="mmPrev" type="button" aria-label="Предыдущий слайд"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/><path d="M9 5l-7 7 7 7" opacity=".45"/></svg></button>
+        <span class="mm-cnt" id="mmCnt">1 / 3</span>
+        <button id="mmNext" type="button" aria-label="Следующий слайд"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/><path d="M15 5l7 7-7 7" opacity=".45"/></svg></button>
+      </div>
     </div>
-    <div class="mm-note">Комикс-инструкция появится здесь. Чтобы заменить кадры на свои картинки,
-      положите изображения в папку сайта и вставьте вместо блоков «КАДР» теги
-      &lt;img src="frame1.png" style="width:100%"&gt;.</div>
   </div>
 </div>
 
@@ -1651,6 +1654,7 @@ function renderJournal() {
 renderJournal();
 
 function openManual() {
+  mmSet(0);
   manual.classList.add('open');
   if (!reduced) gsap.fromTo('.mm-panel', { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: .38, ease: 'power2.out' });
 }
@@ -1679,7 +1683,29 @@ journal.addEventListener('click', e => {
 });
 $('#mmClose').addEventListener('click', closeManual);
 manual.addEventListener('click', e => { if (e.target === manual) closeManual(); });
-window.addEventListener('keydown', e => { if (e.key === 'Escape' && manual.classList.contains('open')) closeManual(); });
+
+/* manual slides */
+const mmSlides = ['manual-1.jpg', 'manual-2.jpg', 'manual-3.jpg'];
+const mmImg = $('#mmImg'), mmCnt = $('#mmCnt'), mmPrev = $('#mmPrev'), mmNext = $('#mmNext');
+let mmIdx = 0;
+function mmSet(i, fade) {
+  mmIdx = Math.max(0, Math.min(mmSlides.length - 1, i));
+  mmImg.src = mmSlides[mmIdx];
+  mmImg.alt = `Инструкция — слайд ${mmIdx + 1}`;
+  mmCnt.textContent = `${mmIdx + 1} / ${mmSlides.length}`;
+  mmPrev.classList.toggle('hidden', mmIdx === 0);
+  mmNext.classList.toggle('hidden', mmIdx === mmSlides.length - 1);
+  if (fade && !reduced) gsap.fromTo(mmImg, { opacity: .3 }, { opacity: 1, duration: .28 });
+}
+const mmGo = d => mmSet(mmIdx + d, true);
+$('#mmPrev').addEventListener('click', () => mmGo(-1));
+$('#mmNext').addEventListener('click', () => mmGo(1));
+window.addEventListener('keydown', e => {
+  if (!manual.classList.contains('open')) return;
+  if (e.key === 'Escape') closeManual();
+  if (e.key === 'ArrowRight') mmGo(1);
+  if (e.key === 'ArrowLeft') mmGo(-1);
+});
 
 /* ---------- reviews carousel ---------- */
 const revTrack = $('#revTrack'), revDots = $('#revDots');
