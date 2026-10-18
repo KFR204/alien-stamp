@@ -60,7 +60,7 @@
   #brand h1 span:last-child { margin-right: -.32em; }
   #egg { height: 2.4em; width: auto; overflow: visible; margin: -.6em .1em -.25em -.05em; cursor: pointer;
     filter: drop-shadow(0 0 14px rgba(127,199,150,.18)); }
-  #brand p { margin-top: 30px; font-size: 16px; letter-spacing: .3em; color: var(--bone-dim); text-transform: uppercase; }
+  #brand p { margin-top: 30px; font-size: 16px; font-weight: 500; letter-spacing: .3em; color: #8ba092; text-transform: uppercase; }
 
   /* ---- monitor housing ---- */
   #term { top: calc(4.5vh + clamp(24px, 3.6vw, 54px) * 2.2 + 50px); right: 4vw; width: min(430px, 42vw);
@@ -175,7 +175,7 @@
   .card-btn { display: inline-block; align-self: flex-start; margin-top: auto; font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
     color: var(--bone); text-decoration: none; border: 1px solid #23362a; padding: 10px 18px; transition: .25s; }
   .card-btn:hover { border-color: var(--accent); color: #e4efe2; box-shadow: 0 0 20px rgba(127,199,150,.15); }
-  .note { margin-top: 28px; font-size: 11px; line-height: 1.9; letter-spacing: .06em; color: var(--bone-dim); max-width: 660px; }
+  .note { margin-top: 28px; font-size: 12px; line-height: 1.9; letter-spacing: .06em; color: var(--bone-dim); max-width: 660px; }
 
   .review { padding: 30px 28px 26px; }
   .review .quote { font-size: 12.5px; line-height: 1.95; letter-spacing: .04em; color: var(--bone);
@@ -201,7 +201,7 @@
     font-family: 'Unbounded', sans-serif; font-size: 16px; color: var(--accent); flex-shrink: 0; }
   .step b { display: block; font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 12px;
     letter-spacing: .2em; text-transform: uppercase; margin-bottom: 7px; }
-  .step p { font-size: 11px; line-height: 1.85; letter-spacing: .06em; color: var(--bone-dim); }
+  .step p { font-size: 12px; line-height: 1.85; letter-spacing: .06em; color: var(--bone-dim); }
 
   .order-wrap { display: grid; grid-template-columns: 1.15fr .85fr; gap: 26px; align-items: start; }
   .fld { margin-bottom: 20px; }
@@ -245,6 +245,35 @@
   .c-link .val { font-size: 13px; letter-spacing: .08em; }
   footer { position: relative; z-index: 30; padding: 60px 6vw 46px; text-align: center;
     font-size: 10px; letter-spacing: .34em; text-transform: uppercase; color: #35443b; }
+
+  /* ===== field manual journal + instruction modal ===== */
+  #journal { transition: filter .3s; }
+  #journal:hover { filter: brightness(1.18) drop-shadow(0 0 18px rgba(127,199,150,.45)); }
+  #journal:hover #jBadge rect { stroke: #b8f5c8; fill: rgba(18,38,24,.95); }
+  #jArrow { animation: jBob 1.8s ease-in-out infinite; }
+  @keyframes jBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+  #manualModal { position: fixed; inset: 0; z-index: 80; display: none; align-items: center; justify-content: center;
+    background: rgba(1,4,3,.84); backdrop-filter: blur(3px); }
+  #manualModal.open { display: flex; }
+  .mm-panel { width: min(900px, 92vw); max-height: 86vh; overflow-y: auto; padding: 28px 32px 26px;
+    border: 1px solid #2f4a38;
+    background: linear-gradient(160deg, #0c150f, #030705);
+    box-shadow: 0 40px 90px rgba(0,0,0,.85), inset 0 0 40px rgba(127,199,150,.04);
+    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%); }
+  .mm-hd { display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid #1d2c22;
+    font-size: 11px; letter-spacing: .3em; color: var(--accent); text-transform: uppercase; }
+  #mmClose { flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .22em;
+    color: var(--bone-dim); background: none; border: 1px solid #23362a; padding: 9px 14px; cursor: pointer; transition: .25s; }
+  #mmClose:hover { color: var(--bone); border-color: var(--accent); box-shadow: 0 0 16px rgba(127,199,150,.15); }
+  .comic { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .comic .frame { aspect-ratio: 16/10; display: flex; flex-direction: column; gap: 8px;
+    align-items: center; justify-content: center; border: 1px dashed #2f4a38;
+    background: rgba(3,8,5,.5); color: var(--bone-dim); font-size: 10px; letter-spacing: .3em; }
+  .comic .frame span { font-size: 8px; letter-spacing: .2em; opacity: .6; }
+  .mm-note { margin-top: 20px; font-size: 10px; line-height: 1.9; letter-spacing: .08em; color: var(--bone-dim); }
+  @media (max-width: 700px) { .comic { grid-template-columns: 1fr; } }
 
   .rv { opacity: 0; transform: translateY(34px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
   .rv.vis { opacity: 1; transform: none; }
@@ -321,6 +350,125 @@
         </g>
         <g id="prints"></g>
         <g id="splats"></g>
+      </g>
+    </g>
+
+    <!-- field manual journal lying on the desk, left of the document -->
+    <g id="journal" transform="translate(210 525)" style="cursor:pointer">
+      <defs>
+        <linearGradient id="journG" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#4e543c"/>
+          <stop offset="55%" stop-color="#333827"/>
+          <stop offset="100%" stop-color="#1b1f15"/>
+        </linearGradient>
+        <linearGradient id="journInG" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6b614b"/>
+          <stop offset="25%" stop-color="#9b8d70"/>
+          <stop offset="100%" stop-color="#83765b"/>
+        </linearGradient>
+        <linearGradient id="pageRightG" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6e634c"/>
+          <stop offset="14%" stop-color="#b5a688"/>
+          <stop offset="92%" stop-color="#cfc2a4"/>
+          <stop offset="100%" stop-color="#9a8c6f"/>
+        </linearGradient>
+        <linearGradient id="pageEdgeG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#a8997b"/>
+          <stop offset="50%" stop-color="#6e634c"/>
+          <stop offset="100%" stop-color="#473f2f"/>
+        </linearGradient>
+        <radialGradient id="jSpotG" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#8ef07a" stop-opacity=".22"/>
+          <stop offset="60%" stop-color="#7fc796" stop-opacity=".07"/>
+          <stop offset="100%" stop-color="#7fc796" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- soft green spotlight pool under the manual so it stands out on the dark desk -->
+      <ellipse cx="0" cy="6" rx="145" ry="68" fill="url(#jSpotG)" pointer-events="none"/>
+
+      <!-- book in desk perspective -->
+      <g id="jBook" transform="scale(.95 .58) rotate(6)">
+        <!-- drop shadow on desk (bottom & right only) -->
+        <rect x="-106" y="-76" width="218" height="168" rx="4" fill="#000" opacity=".58" transform="translate(9 14)"/>
+
+        <!-- back board (bottom cover sticking out slightly) -->
+        <rect x="-106" y="-78" width="214" height="164" rx="4" fill="#171a12" stroke="#0c0e09" stroke-width="1.5"/>
+
+        <!-- 3D page block thickness: bottom & right stepped edges with page lines -->
+        <polygon points="-102,78 103,78 108,88 -97,88" fill="url(#pageEdgeG)" stroke="#2b261c" stroke-width=".8"/>
+        <path d="M -99 81 H 105 M -98 84 H 106 M -97 86.5 H 107" stroke="#3c3527" stroke-width=".7" opacity=".7"/>
+        <polygon points="103,-76 108,-66 108,88 103,78" fill="#7c7058" stroke="#2b261c" stroke-width=".8"/>
+        <path d="M 105 -72 V 83 M 106.8 -69 V 86" stroke="#3c3527" stroke-width=".7" opacity=".7"/>
+
+        <!-- yellow index tab sticking out on the right -->
+        <g id="jTab">
+          <path d="M 102 -18 L 122 -16 L 122 12 L 102 14 Z" fill="#c9972c" stroke="#4a350c" stroke-width="1"/>
+          <path d="M 106 -11 V 8" stroke="#4a350c" stroke-width="1.2" opacity=".65"/>
+        </g>
+
+        <!-- right-hand inner pages (visible when cover opens) -->
+        <g id="jPages">
+          <rect x="-100" y="-76" width="203" height="154" rx="2" fill="url(#pageRightG)" stroke="#5b503d" stroke-width="1"/>
+          <!-- gutter shadow near spine -->
+          <rect x="-100" y="-76" width="22" height="154" fill="#000" opacity=".22"/>
+          <!-- schematic diagram of a stamp mount + callouts -->
+          <rect x="-72" y="-58" width="76" height="54" fill="none" stroke="#4b402f" stroke-width="1.3"/>
+          <circle cx="-34" cy="-31" r="18" fill="none" stroke="#8c1a12" stroke-width="1.4" stroke-dasharray="3 2"/>
+          <path d="M -44 -48 H -24 L -20 -34 H -48 Z" fill="none" stroke="#4b402f" stroke-width="1.2"/>
+          <path d="M 16 -56 H 86 M 16 -44 H 82 M 16 -32 H 86 M 16 -20 H 68" stroke="#5e5241" stroke-width="2"/>
+          <path d="M -72 10 H 86 M -72 22 H 82 M -72 34 H 86 M -72 46 H 74 M -72 58 H 60" stroke="#6f624d" stroke-width="1.4" opacity=".8"/>
+          <text x="16" y="-4" font-family="Unbounded" font-weight="500" font-size="6.2" fill="#8c1a12" letter-spacing=".6">СХЕМА ОСНАСТКИ</text>
+        </g>
+
+        <!-- spine ridge (always stays at the hinge x=-100) -->
+        <rect x="-106" y="-79" width="12" height="165" rx="2" fill="#14170f" stroke="#090b07" stroke-width="1"/>
+        <rect x="-98" y="-52" width="4" height="14" rx="1" fill="#7c7562" stroke="#232018" stroke-width=".7"/>
+        <rect x="-98" y="38" width="4" height="14" rx="1" fill="#7c7562" stroke="#232018" stroke-width=".7"/>
+
+        <!-- front cover: deformed in 3D via JS when opening (hinged at x=-100) -->
+        <g id="jCover">
+          <!-- dynamic 3D cover polygon (used during flip) -->
+          <polygon id="jCovPoly" points="-100,-78 105,-78 105,78 -100,78" fill="url(#journG)" stroke="#141810" stroke-width="2"/>
+          <!-- cover details (fade out past 90deg of flip) -->
+          <g id="jCovFront">
+            <!-- embossed frame + rivets -->
+            <rect x="-86" y="-68" width="178" height="136" rx="2" fill="none" stroke="#22271b" stroke-width="1.4"/>
+            <rect x="-85" y="-67" width="178" height="136" rx="2" fill="none" stroke="#636b4e" stroke-width=".8" opacity=".55"/>
+            <circle cx="-80" cy="-62" r="2" fill="#6e745c"/><circle cx="86" cy="-62" r="2" fill="#6e745c"/>
+            <circle cx="-80" cy="62" r="2" fill="#6e745c"/><circle cx="86" cy="62" r="2" fill="#6e745c"/>
+            <!-- worn paper label glued to cover -->
+            <g transform="rotate(-1.2)">
+              <rect x="-72" y="-50" width="150" height="84" rx="2" fill="#bfb193" stroke="#5b503c" stroke-width="1.2"/>
+              <rect x="-68" y="-46" width="142" height="76" fill="none" stroke="#7a6d58" stroke-width=".7" stroke-dasharray="4 2"/>
+              <rect x="-68" y="-46" width="142" height="16" fill="#2a2d20"/>
+              <text x="3" y="-35" text-anchor="middle" font-family="IBM Plex Mono" font-weight="500" font-size="8" letter-spacing="3" fill="#c8d4b8">ALIEN ШТАМП</text>
+              <text x="3" y="-8" text-anchor="middle" font-family="Unbounded" font-weight="700" font-size="12.5" letter-spacing="1.6" fill="#2b2418">ИНСТРУКЦИЯ</text>
+              <text x="3" y="13" text-anchor="middle" font-family="IBM Plex Mono" font-weight="500" font-size="8.5" letter-spacing="1.4" fill="#4e4332">КАК ВЫБРАТЬ ОСНАСТКУ</text>
+            </g>
+            <!-- grime/wear scratches -->
+            <path d="M -60 52 L -28 56 M 30 -58 L 52 -55" stroke="#1b1f15" stroke-width="1.2" opacity=".6"/>
+          </g>
+          <!-- inside of front cover (visible after 90deg of flip) -->
+          <g id="jCovBack" opacity="0">
+            <path id="jCovInLines" d="" stroke="#6b5f49" stroke-width="1.2" opacity=".65"/>
+          </g>
+        </g>
+
+        <!-- elastic strap corners when closed -->
+        <path id="jStrap" d="M 82 -79 L 106 -55 M 82 79 L 106 55" stroke="#141710" stroke-width="5" stroke-linecap="round"/>
+      </g>
+
+      <!-- un-foreshortened HUD callout above the book so user clearly sees it's clickable -->
+      <g id="jCallout" transform="translate(0 -66)">
+        <g id="jArrow">
+          <g id="jBadge">
+            <rect x="-88" y="-18" width="176" height="26" rx="2" fill="rgba(6,16,10,.88)" stroke="#4c8c62" stroke-width="1.2"/>
+            <circle cx="-73" cy="-5" r="3.5" fill="#8ef07a"/>
+            <text x="6" y="-1" text-anchor="middle" font-family="IBM Plex Mono" font-weight="500" font-size="10" letter-spacing="2.2" fill="#d6ead9">ЧИТАТЬ ИНСТРУКЦИЮ</text>
+          </g>
+          <path d="M 0 10 L 0 26 M -5 20 L 0 27 L 5 20" fill="none" stroke="#8ef07a" stroke-width="1.5" stroke-linecap="round"/>
+        </g>
       </g>
     </g>
 
@@ -573,7 +721,7 @@
   <button class="btn" id="stampBtn">Поставить печать</button>
 </div>
 
-<a id="scrollHint" href="#services">▼ ЗАКАЗАТЬ ПЕЧАТЬ ▼</a>
+<a id="scrollHint" href="#order">▼ ЗАКАЗАТЬ ПЕЧАТЬ ▼</a>
 <div id="blackout"></div>
 
 </section>
@@ -587,7 +735,7 @@
     <h2>Печати и штампы</h2>
     <div class="grid">
       <div class="card rv">
-        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="round" data-ink="#2b3a95"></svg>
+        <svg class="stamp" viewBox="-80 -80 160 160" data-shape="round" data-ink="#2b3a95" style="transform: rotate(50deg)"></svg>
         <h3>Круглая печать</h3>
         <div class="price">от 600 ₽</div>
         <div class="meta">Для ИП и организаций</div>
@@ -735,6 +883,22 @@
 </main>
 
 <footer>ALIEN ШТАМП · ИЗГОТОВЛЕНИЕ ПЕЧАТЕЙ И ШТАМПОВ · 2026</footer>
+
+<!-- instruction manual modal (comic placeholder) -->
+<div id="manualModal" role="dialog" aria-label="Инструкция по выбору оснастки">
+  <div class="mm-panel">
+    <div class="mm-hd"><span>// ИНСТРУКЦИЯ — ВЫБОР ОСНАСТКИ</span><button id="mmClose" type="button">✕ ЗАКРЫТЬ</button></div>
+    <div class="comic">
+      <div class="frame">КАДР 01<span>— место под иллюстрацию —</span></div>
+      <div class="frame">КАДР 02<span>— место под иллюстрацию —</span></div>
+      <div class="frame">КАДР 03<span>— место под иллюстрацию —</span></div>
+      <div class="frame">КАДР 04<span>— место под иллюстрацию —</span></div>
+    </div>
+    <div class="mm-note">Комикс-инструкция появится здесь. Чтобы заменить кадры на свои картинки,
+      положите изображения в папку сайта и вставьте вместо блоков «КАДР» теги
+      &lt;img src="frame1.png" style="width:100%"&gt;.</div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script>
@@ -1440,6 +1604,82 @@ $('#copyBtn').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(orderText()); sendHint('Текст заявки скопирован в буфер.'); }
   catch (e) { sendHint('Не удалось скопировать — выделите заявку вручную.'); }
 });
+
+/* ---------- field manual: journal on the desk opens the instruction modal ---------- */
+const manual = $('#manualModal');
+const jCovPoly = $('#jCovPoly'), jCovFront = $('#jCovFront'), jCovBack = $('#jCovBack'),
+      jCovInLines = $('#jCovInLines'), jStrap = $('#jStrap'), jCallout = $('#jCallout');
+const J = { p: 0 }; // 0 = closed, 1 = fully flipped open to the left
+let jOpen = false;
+
+function renderJournal() {
+  const p = J.p, a = p * Math.PI;
+  const c = Math.cos(a), s = Math.sin(a);
+  // hinge at x = -100; free edge swings 205px from right (+105) over an arc to left (-295)
+  const w = 205 * c;
+  const lift = 95 * s; // vertical arc height above the desk during the flip
+  const skew = 18 * s; // perspective flare while the edge is up in the air
+  const xEdge = (-100 + w).toFixed(1);
+  const yTop = (-78 - lift - skew * .4).toFixed(1);
+  const yBot = (78 - lift + skew * .6).toFixed(1);
+  jCovPoly.setAttribute('points', `-100,-78 ${xEdge},${yTop} ${xEdge},${yBot} -100,78`);
+
+  if (c >= 0) {
+    // front face visible: foreshorten & skew cover artwork to match the polygon
+    jCovPoly.setAttribute('fill', 'url(#journG)');
+    jCovFront.setAttribute('opacity', Math.min(1, c * 1.35).toFixed(2));
+    const sy = (-lift / 205 * Math.sign(c || 1)).toFixed(3);
+    jCovFront.setAttribute('transform',
+      `translate(-100 0) matrix(${Math.max(.02, c).toFixed(3)} ${sy} 0 1 0 ${(-lift * .15).toFixed(1)}) translate(100 0)`);
+    jCovBack.setAttribute('opacity', 0);
+  } else {
+    // inside of cover visible on the left side of the spine
+    jCovPoly.setAttribute('fill', 'url(#journInG)');
+    jCovFront.setAttribute('opacity', 0);
+    jCovBack.setAttribute('opacity', Math.min(1, -c * 1.35).toFixed(2));
+    const x1 = (-100 + w * .15).toFixed(1), x2 = (-100 + w * .85).toFixed(1);
+    let d = '';
+    for (let k = -52; k <= 52; k += 16) {
+      const yL = (k - lift * .85).toFixed(1);
+      d += `M ${x1} ${k} L ${x2} ${yL} `;
+    }
+    jCovInLines.setAttribute('d', d);
+  }
+  jStrap.setAttribute('opacity', Math.max(0, 1 - p * 4).toFixed(2));
+  jCallout.setAttribute('opacity', Math.max(0, 1 - p * 2.5).toFixed(2));
+}
+renderJournal();
+
+function openManual() {
+  manual.classList.add('open');
+  if (!reduced) gsap.fromTo('.mm-panel', { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: .38, ease: 'power2.out' });
+}
+function closeManual() {
+  const done = () => {
+    manual.classList.remove('open');
+    gsap.timeline({ onComplete: () => { jOpen = false; } })
+      .to(J, { p: 0, duration: .65, ease: 'power2.inOut', onUpdate: renderJournal });
+  };
+  reduced ? (J.p = 0, renderJournal(), manual.classList.remove('open'), jOpen = false)
+          : gsap.to('.mm-panel', { y: 14, opacity: 0, duration: .22, ease: 'power2.in', onComplete: done });
+}
+const journal = $('#journal');
+journal.addEventListener('pointerdown', e => e.stopPropagation());
+journal.addEventListener('click', e => {
+  e.stopPropagation();
+  if (jOpen) return;
+  jOpen = true;
+  sfx.snap();
+  log('ОТКРЫТА ИНСТРУКЦИЯ — ВЫБОР ОСНАСТКИ');
+  if (reduced) { J.p = 1; renderJournal(); openManual(); return; }
+  gsap.timeline()
+    .to(J, { p: 1, duration: .72, ease: 'power2.inOut', onUpdate: renderJournal }, 0)
+    .add(() => sfx.hiss(.22), .18)
+    .add(openManual, .58);
+});
+$('#mmClose').addEventListener('click', closeManual);
+manual.addEventListener('click', e => { if (e.target === manual) closeManual(); });
+window.addEventListener('keydown', e => { if (e.key === 'Escape' && manual.classList.contains('open')) closeManual(); });
 
 /* ---------- reviews carousel ---------- */
 const revTrack = $('#revTrack'), revDots = $('#revDots');
