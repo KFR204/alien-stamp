@@ -280,8 +280,9 @@
     width: 34px; height: 34px; font-size: 15px; line-height: 1;
     color: var(--bone-dim); background: none; border: 1px solid #23362a; cursor: pointer; transition: .25s; }
   #mmClose:hover { color: var(--bone); border-color: var(--accent); box-shadow: 0 0 16px rgba(127,199,150,.15); }
-  .mm-slide { position: relative; }
-  .mm-slide img { display: block; width: 100%; border: 1px solid #1d2c22; }
+  .mm-slide { position: relative; overflow: hidden; touch-action: pan-y; user-select: none; cursor: grab; }
+  .mm-slide:active { cursor: grabbing; }
+  .mm-slide img { display: block; width: 100%; border: 1px solid #1d2c22; -webkit-user-drag: none; pointer-events: none; }
   #mmOrder { position: absolute; right: 9%; bottom: 7%; font-family: 'IBM Plex Mono', monospace;
     font-size: 12px; letter-spacing: .22em; text-transform: uppercase; padding: 15px 30px 14px 34px;
     cursor: pointer; color: var(--bone); background: rgba(6,20,13,.92); border: 1px solid var(--accent);
@@ -643,11 +644,26 @@
           <stop offset="75%" stop-color="#15160f"/>
           <stop offset="100%" stop-color="#050604"/>
         </radialGradient>
-        <radialGradient id="eVoidG" cx="50%" cy="55%" r="50%">
-          <stop offset="0%" stop-color="#8aa45c" stop-opacity=".55"/>
-          <stop offset="45%" stop-color="#141c0c" stop-opacity=".9"/>
-          <stop offset="100%" stop-color="#030402" stop-opacity="0"/>
+        <radialGradient id="eVoidG" cx="50%" cy="55%" r="55%">
+          <stop offset="0%" stop-color="#8eb85a" stop-opacity=".42"/>
+          <stop offset="45%" stop-color="#17200e" stop-opacity=".95"/>
+          <stop offset="100%" stop-color="#050703"/>
         </radialGradient>
+        <linearGradient id="eFleshG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#9e7454"/>
+          <stop offset="50%" stop-color="#5c3d28"/>
+          <stop offset="100%" stop-color="#1c120b"/>
+        </linearGradient>
+        <linearGradient id="ePetalInL" x1="1" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#22170f"/>
+          <stop offset="55%" stop-color="#6b4a33"/>
+          <stop offset="100%" stop-color="#a8825e"/>
+        </linearGradient>
+        <linearGradient id="ePetalInR" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#22170f"/>
+          <stop offset="55%" stop-color="#6b4a33"/>
+          <stop offset="100%" stop-color="#a8825e"/>
+        </linearGradient>
         <radialGradient id="eHaloG">
           <stop offset="0%" stop-color="#a9cf7a" stop-opacity=".5"/>
           <stop offset="100%" stop-color="#a9cf7a" stop-opacity="0"/>
@@ -679,46 +695,46 @@
         </filter>
         <path id="eBodyShape" d="M 60 18 C 84 18, 104 52, 103 88 C 102 118, 84 142, 60 142 C 36 142, 18 118, 17 88 C 16 52, 36 18, 60 18 Z"/>
         <clipPath id="eBodyClip"><use href="#eBodyShape"/></clipPath>
-        <!-- slides down while the lobes part, removing the closed crown -->
-        <clipPath id="eCut"><rect id="eCutRect" x="-10" y="0" width="140" height="170"/></clipPath>
       </defs>
       <!-- base: shadow, root growths, floor mist -->
       <ellipse cx="60" cy="144" rx="46" ry="5" fill="#000" opacity=".6"/>
       <g fill="#0b0c08">
                 <path d="M 30 138 C 44 146, 76 146, 90 138 C 80 143, 40 143, 30 138 Z"/>
       </g>
-      <path id="eBack" d="M 47 44 C 49 30, 55 20, 60 18 C 65 20, 71 30, 73 44 Z" fill="url(#eShell)" stroke="#050504" stroke-width=".8" stroke-opacity=".55"/>
-      <ellipse id="eHalo" cx="60" cy="36" rx="30" ry="18" fill="url(#eHaloG)" opacity="0"/>
-      <g clip-path="url(#eCut)">
-        <g filter="url(#eSkin)">
-          <use href="#eBodyShape" fill="url(#eShell)"/>
-          <g id="eVeins" clip-path="url(#eBodyClip)" fill="none" stroke-linecap="round"></g>
-          <g fill="none" stroke-linecap="round">
-            <path d="M 46 46 C 41 56, 38 66, 37 79 M 74 46 C 79 56, 82 66, 83 79" stroke="#050504" stroke-width="1.2" opacity=".4"/>
-            <path d="M 45 46 C 40 56, 37 66, 36 79 M 75 46 C 80 56, 83 66, 84 79" stroke="#6d6c55" stroke-width=".6" opacity=".45"/>
-            <!-- closed crown: cross-shaped slit between the four lobes -->
-            <path d="M 60 19 C 54 26, 49 35, 47 46 M 60 19 C 66 26, 71 35, 73 46 M 60 19 C 59 26, 59 32, 60 36" stroke="#030302" stroke-width="1.3" opacity=".85"/>
-            <path d="M 59 20 C 53 27, 48 36, 46 46 M 59 20 C 58 27, 58 32, 59 36" stroke="#8e8d70" stroke-width=".5" opacity=".4"/>
-          </g>
+      <ellipse id="eHalo" cx="60" cy="38" rx="38" ry="25" fill="url(#eHaloG)" opacity="0"/>
+      <!-- back petals (outer skin + fleshy inner face when peeled back) -->
+      <g filter="url(#eSkin)">
+        <path id="eBackL" fill="url(#eShell)"/>
+        <path id="eBackR" fill="url(#eShell)"/>
+      </g>
+      <path id="eBackInL" fill="url(#ePetalInL)" stroke="#24180f" stroke-width=".7" opacity="0"/>
+      <path id="eBackInR" fill="url(#ePetalInR)" stroke="#24180f" stroke-width=".7" opacity="0"/>
+      <!-- deep dark throat cavity -->
+      <path id="eCavity" fill="url(#eVoidG)" stroke="url(#eFleshG)" stroke-width="1.6" stroke-linejoin="round"/>
+      <path id="eInnerGlow" fill="url(#eHaloG)" opacity="0"/>
+      <!-- inner segments of tendrils emerging from the throat -->
+      <g id="eFingersIn" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+      <!-- main egg body + front & side outer skin -->
+      <g filter="url(#eSkin)">
+        <path id="eShellMain" fill="url(#eShell)"/>
+        <g id="eVeins" clip-path="url(#eBodyClip)" fill="none" stroke-linecap="round"></g>
+        <g fill="none" stroke-linecap="round">
+          <path d="M 46 52 C 41 62, 38 70, 37 82 M 74 52 C 79 62, 82 70, 83 82" stroke="#050504" stroke-width="1.2" opacity=".4"/>
+          <path d="M 45 52 C 40 62, 37 70, 36 82 M 75 52 C 80 62, 83 70, 84 82" stroke="#6d6c55" stroke-width=".6" opacity=".45"/>
         </g>
-        <use href="#eBodyShape" fill="none" stroke="url(#eRim)" stroke-width="1.6"/>
+        <path id="eFrontLip" fill="url(#eShell)"/>
       </g>
-      <ellipse id="eVoid" cx="60" cy="43" rx="10" ry="1.5" fill="url(#eVoidG)"/>
-      <g id="eLobes" opacity="0">
-      <g id="eL" filter="url(#eSkin)">
-        <path d="M 27 44 C 28 31, 42 19, 58 18.3 L 60 18.6 C 55 27, 50 35, 47 47 C 39 48, 32 47, 27 44 Z" fill="url(#eShell)"/>
-        <path d="M 36 36 C 39 28, 45 23, 52 21" fill="none" stroke="#8a8a6c" stroke-width=".5" opacity=".3"/>
-      </g>
-      <g id="eR" filter="url(#eSkin)">
-        <path d="M 93 44 C 92 31, 78 19, 62 18.3 L 60 18.6 C 65 27, 70 35, 73 47 C 81 48, 88 47, 93 44 Z" fill="url(#eShell)"/>
-        <path d="M 84 36 C 81 28, 75 23, 68 21" fill="none" stroke="#8a8a6c" stroke-width=".6" opacity=".3"/>
-      </g>
-      <g id="eFingers" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
-      <g id="eF" filter="url(#eSkin)">
-        <path d="M 46 47 C 48 35, 54 26, 60 19 C 66 26, 72 35, 74 47 C 67 50, 53 50, 46 47 Z" fill="url(#eShell)"/>
-        <path d="M 52 38 C 54 31, 57 25, 60 22" fill="none" stroke="#8f8f70" stroke-width=".5" opacity=".3"/>
-      </g>
-      </g>
+      <!-- fleshy inner lining of side & front peeled petals -->
+      <path id="eSideInL" fill="url(#ePetalInL)" stroke="#2b1d12" stroke-width=".7" opacity="0"/>
+      <path id="eSideInR" fill="url(#ePetalInR)" stroke="#2b1d12" stroke-width=".7" opacity="0"/>
+      <path id="eFrontIn" fill="url(#eFleshG)" stroke="#24180f" stroke-width=".7" opacity="0"/>
+      <path id="eRimUse" fill="none" stroke="url(#eRim)" stroke-width="1.5"/>
+      <path id="eFleshRim" fill="none" stroke="url(#eFleshG)" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
+      <path id="eSlime" fill="none" stroke="#c5d6a3" stroke-linecap="round" opacity="0"/>
+      <path id="eSeam" fill="none" stroke="#040403" stroke-width="1.35" stroke-linecap="round"/>
+      <path id="eSeamHi" fill="none" stroke="#8e8d70" stroke-width=".55" stroke-linecap="round" opacity=".45"/>
+      <!-- outer segments of tendrils curling over the peeled petals -->
+      <g id="eFingersOut" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
       <ellipse cx="60" cy="141" rx="58" ry="8" fill="url(#eMistG)"/>
     </svg>
     <span>ШТАМП</span></h1>
@@ -899,8 +915,6 @@
       <a class="c-link rv" href="https://wa.me/70000000000" target="_blank" rel="noopener"><span class="net">WhatsApp</span><span class="val">+7 (000) 000-00-00</span></a>
       <a class="c-link rv" href="https://vk.com/alien_stamp" target="_blank" rel="noopener"><span class="net">VK</span><span class="val">vk.com/alien_stamp</span></a>
     </div>
-    <p class="note">г. Санкт-Петербург · мастерская: адрес уточняется · пн–пт 10:00–19:00.
-      Самовывоз, доставка по городу и почтой по всей России.</p>
   </div></section>
 
 </main>
@@ -1226,7 +1240,7 @@ function startAmbient() {
     const src = AC.createBufferSource(); src.buffer = buf; src.loop = true;
     musGain = AC.createGain(); musGain.gain.value = 0;
     src.connect(musGain).connect(AC.destination); src.start();
-    musGain.gain.linearRampToValueAtTime(.06, AC.currentTime + 8);
+    musGain.gain.linearRampToValueAtTime(.1, AC.currentTime + 8);
   }).catch(() => {});
 }
 function toggleSound() {
@@ -1464,10 +1478,14 @@ function flicker() {
   });
 }
 
-/* ---------- logo egg: lobes part, facehugger fingers feel over the rim ---------- */
-const E = { open: 0, out: 0, twitch: 0 };
-const eL = $('#eL'), eR = $('#eR'), eF = $('#eF'), eBack = $('#eBack'), eVoid = $('#eVoid'), eHalo = $('#eHalo'),
-      eLobes = $('#eLobes'), eCutRect = $('#eCutRect');
+/* ---------- logo egg: 4 fleshy petals peel back organically, 3 tendrils grope with randomized motion ---------- */
+const E = { open: 0, t0: 0, t1: 0, t2: 0, twitch: 0, swell: 0 };
+const eBackL = $('#eBackL'), eBackR = $('#eBackR'), eBackInL = $('#eBackInL'), eBackInR = $('#eBackInR'),
+      eSideInL = $('#eSideInL'), eSideInR = $('#eSideInR'), eFrontIn = $('#eFrontIn'),
+      eShellMain = $('#eShellMain'), eRimUse = $('#eRimUse'),
+      eCavity = $('#eCavity'), eInnerGlow = $('#eInnerGlow'), eFleshRim = $('#eFleshRim'),
+      eFrontLip = $('#eFrontLip'), eSlime = $('#eSlime'), eSeam = $('#eSeam'), eSeamHi = $('#eSeamHi'),
+      eHalo = $('#eHalo'), eggSvg = $('#egg');
 
 // static organic veins: wandering, branching ridges rising from the base
 (() => {
@@ -1489,54 +1507,197 @@ const eL = $('#eL'), eR = $('#eR'), eF = $('#eF'), eBack = $('#eBack'), eVoid = 
     .forEach(([x, y, a]) => vein(x, y, a, 55 + r() * 40, 1.8 + r() * 1.2, 0));
 })();
 
-// facehugger fingers: long knuckled bone digits, only the tips come out
-const FINGERS = [];
-for (const [k, sgn] of [[1, -1], [0, -1], [0, 1], [1, 1]]) {
-  const g = $('#eFingers');
-  FINGERS.push({ k, sgn,
-    under: el('path', { stroke: '#0d0b07', 'stroke-width': 2.4, opacity: .85 }, g),
-    bone: el('path', { stroke: '#5f5b46', 'stroke-width': 1.3 }, g),
-    hi: el('path', { stroke: '#cfc8a8', 'stroke-width': .4, opacity: .35 }, g),
-    claw: el('path', { stroke: '#8f8a6e', 'stroke-width': .7 }, g),
-    knuckles: [0, 1].map(() => el('circle', { r: 0, fill: '#7c7660', stroke: '#14110b', 'stroke-width': .45 }, g)) });
+// 3 larger, distinct tendrils scattered around the rim; each has its own progress key & randomized pose per hatch
+const TENDRIL_BASES = [
+  // 0: long left-front digit — hooks over the left cleft and grips down the outer shell
+  { key: 't0', sgn: -1, p0: { x: 52, y: 54 }, p1: { x: 35, y: 29 }, p2: { x: 19, y: 35 }, p3: { x: 14, y: 51 } },
+  // 1: right digit — reaches out over the right petal at a higher angle, probing the air
+  { key: 't1', sgn:  1, p0: { x: 67, y: 54 }, p1: { x: 83, y: 27 }, p2: { x: 97, y: 33 }, p3: { x: 101, y: 47 } },
+  // 2: upper-back tendril — rises from deep in the throat between back petals, uncurling high
+  { key: 't2', sgn: -1, p0: { x: 59, y: 54 }, p1: { x: 51, y: 21 }, p2: { x: 38, y: 15 }, p3: { x: 29, y: 23 } }
+];
+const TENDRILS = TENDRIL_BASES.map((cfg, idx) => {
+  const gIn = $('#eFingersIn'), gOut = $('#eFingersOut');
+  return { ...cfg, idx,
+    jx: 0, jy: 0, freq1: 5 + idx * 1.3, freq2: 7.4 - idx * .9, phase: idx * 2.1,
+    inUnder: el('path', { stroke: '#090805', 'stroke-width': 3.8, opacity: .92 }, gIn),
+    inBone:  el('path', { stroke: '#7a7052', 'stroke-width': 2.2 }, gIn),
+    inHi:    el('path', { stroke: '#dfd6b2', 'stroke-width': .65, opacity: .48 }, gIn),
+    shadow:  el('path', { stroke: '#030302', 'stroke-width': 4.2, opacity: .55, transform: 'translate(.8 1.8)' }, gOut),
+    under:   el('path', { stroke: '#090805', 'stroke-width': 3.5, opacity: .92 }, gOut),
+    bone:    el('path', { stroke: '#857a5a', 'stroke-width': 2.05 }, gOut),
+    hi:      el('path', { stroke: '#e8dfc0', 'stroke-width': .6, opacity: .52 }, gOut),
+    claw:    el('path', { stroke: '#b8ae8a', 'stroke-width': 1.1 }, gOut),
+    joints:  [0, 1].map(() => el('circle', { r: 0, fill: '#918666', stroke: '#120f09', 'stroke-width': .55 }, gOut)) };
+});
+function randomizeTendrils() {
+  TENDRILS.forEach(tr => {
+    tr.jx = rand(-4.5, 4.5);
+    tr.jy = rand(-4, 4);
+    tr.freq1 = rand(4.2, 7.8);
+    tr.freq2 = rand(6.0, 9.5);
+    tr.phase = rand(0, 6.28);
+  });
 }
+randomizeTendrils();
+
 const clamp01 = v => Math.max(0, Math.min(1, v));
+const smooth = v => { const x = clamp01(v); return x * x * (3 - 2 * x); };
 const lerpP = (a, b, t) => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
 const f1 = v => v.toFixed(1);
 
 function renderEgg() {
-  const t = performance.now() / 1000, o = E.open, parted = o > .005;
-  // closed: one seamless shell with a cross slit; once it parts, separate lobes take over the crown
-  eLobes.setAttribute('opacity', parted ? 1 : 0);
-  eCutRect.setAttribute('y', parted ? 44 : 0);
-  // side lobes peel outward and sag, like thick lips parting
-  eL.setAttribute('transform', `translate(27 44) rotate(${f1(-20 * o)}) scale(${(1 + .05 * o).toFixed(3)} ${(1 - .3 * o).toFixed(3)}) translate(-27 -44)`);
-  eR.setAttribute('transform', `translate(93 44) rotate(${f1(20 * o)}) scale(${(1 + .05 * o).toFixed(3)} ${(1 - .3 * o).toFixed(3)}) translate(-93 -44)`);
-  eF.setAttribute('transform', `translate(0 46) scale(1 ${(1 - .55 * o).toFixed(3)}) translate(0 -46)`);
-  eBack.setAttribute('transform', `translate(0 44) scale(1 ${(.6 * o).toFixed(3)}) translate(0 -44)`);
-  eVoid.setAttribute('rx', f1(10 + 12 * o));
-  eVoid.setAttribute('ry', f1(1 + 4.5 * o));
-  const pulse = .75 + .25 * Math.sin(t * 1.6);
-  eVoid.setAttribute('opacity', (clamp01(o * 2.5) * (.6 + .4 * pulse)).toFixed(2));
-  eHalo.setAttribute('opacity', (o * pulse * .8).toFixed(2));
+  const t = performance.now() / 1000, o = E.open;
+  const breath = Math.sin(t * 1.7) * .012 + E.swell * .04;
+  eggSvg.style.transform = `scale(${(1 + breath).toFixed(3)}, ${(1 - breath * .55).toFixed(3)})`;
 
-  FINGERS.forEach(({ k, sgn, under, bone, hi, claw, knuckles }) => {
-    const e = clamp01((E.out - k * .15) / .85);
-    if (e <= 0) { [under, bone, hi, claw].forEach(p => p.setAttribute('d', '')); knuckles.forEach(c => c.setAttribute('r', 0)); return; }
-    const tw = E.twitch * Math.sin(t * 8 + k * 2.1 + sgn * 1.3);
-    const p0 = { x: 60 + sgn * (3 + k * 4), y: 45 };
-    const p1o = { x: 60 + sgn * (9 + k * 7), y: 29 - k * 2 + tw * .6 };
-    const p2o = { x: 60 + sgn * (18 + k * 8 + tw), y: 32 + k * 3 };
-    const p3o = { x: 60 + sgn * (21 + k * 8 + tw * 1.4), y: 41 + k * 5 + tw };
-    const e1 = clamp01(e * 2.4), e2 = clamp01(e * 2.4 - .8), e3 = clamp01(e * 2.4 - 1.4);
+  // Staggered per-petal opening so the 4 lobes peel apart asynchronously like a real organism
+  const oL = smooth((o - .00) / .88);
+  const oR = smooth((o - .07) / .88);
+  const oB = smooth((o - .03) / .90);
+  const oF = smooth((o - .10) / .90);
+
+  // Petal tips: when closed (o=0) all 4 meet cleanly at apex (60,18); when open they peel outward & curl down
+  const tipLx = 60 - 44 * oL, tipLy = 18 + 5 * Math.sin(oL * Math.PI) + 22 * oL * oL;
+  const tipRx = 60 + 44 * oR, tipRy = 18 + 5 * Math.sin(oR * Math.PI) + 22 * oR * oR;
+  const crouch = 18 + 30 * oF;   // front cleft drops from apex (18) to y=48
+  const backRim = 18 + 16 * oB;  // rear cleft drops from 18 to y=34
+
+  // Lower ovoid cup of the egg: smooth dome at o=0, dipped saddle between shoulders (25,52)-(95,52) when open
+  const shellD = `M 25 52 ` +
+    `C 18 65, 17 77, 17 88 ` +
+    `C 18 118, 36 142, 60 142 C 84 142, 102 118, 103 88 ` +
+    `C 103 77, 102 65, 95 52 ` +
+    `C ${f1(88 - 6 * oR)} ${f1(28 + 20 * oR)}, ${f1(74)} ${f1(crouch)}, 60 ${f1(crouch)} ` +
+    `C ${f1(46)} ${f1(crouch)}, ${f1(32 + 6 * oL)} ${f1(28 + 20 * oL)}, 25 52 Z`;
+  eShellMain.setAttribute('d', shellD);
+  eRimUse.setAttribute('d', shellD);
+
+  // Left & right petals rooted on the shoulders (25,52)..(46,crouch) and (74,crouch)..(95,52)
+  const cleftY = 18 + 30 * oF;
+  const petLD = `M 25 52 C ${f1(28 - 12 * oL)} ${f1(32 + 6 * oL)}, ${f1(44 - 24 * oL)} ${f1(19 + 10 * oL)}, ${f1(tipLx)} ${f1(tipLy)} ` +
+                `Q ${f1(38 - 6 * oL)} ${f1(28 + 14 * oL)} 46 ${f1(cleftY)} Z`;
+  const petRD = `M 95 52 C ${f1(92 + 12 * oR)} ${f1(32 + 6 * oR)}, ${f1(76 + 24 * oR)} ${f1(19 + 10 * oR)}, ${f1(tipRx)} ${f1(tipRy)} ` +
+                `Q ${f1(82 + 6 * oR)} ${f1(28 + 14 * oR)} 74 ${f1(cleftY)} Z`;
+
+  // Back petals flaring behind the throat + their fleshy inner lining (hidden when closed so apex is clean)
+  if (o > .02) {
+    const bxL = 60 - 25 * oB, bxR = 60 + 25 * oB, by = 18 + 7 * oB;
+    const dBL = `M 35 43 Q ${f1(37 - 7 * oB)} ${f1(23 + 3 * oB)} ${f1(bxL)} ${f1(by)} Q ${f1(52 - 4 * oB)} ${f1(23 + 7 * oB)} 60 ${f1(backRim + 2)} Z`;
+    const dBR = `M 85 43 Q ${f1(83 + 7 * oB)} ${f1(23 + 3 * oB)} ${f1(bxR)} ${f1(by)} Q ${f1(68 + 4 * oB)} ${f1(23 + 7 * oB)} 60 ${f1(backRim + 2)} Z`;
+    eBackL.setAttribute('d', dBL); eBackR.setAttribute('d', dBR);
+    eBackInL.setAttribute('d', dBL); eBackInR.setAttribute('d', dBR);
+    const opB = clamp01(o * 1.6).toFixed(2);
+    eBackL.setAttribute('opacity', opB); eBackR.setAttribute('opacity', opB);
+    eBackInL.setAttribute('opacity', (clamp01(oB * 1.3) * .8).toFixed(2));
+    eBackInR.setAttribute('opacity', (clamp01(oB * 1.3) * .8).toFixed(2));
+  } else {
+    [eBackL, eBackR, eBackInL, eBackInR].forEach(p => p.setAttribute('opacity', 0));
+  }
+
+  // Inner fleshy face of side petals ( crescent along the upper/inner edge of each peeled side petal )
+  if (o > .04) {
+    const inLD = `M ${f1(tipLx)} ${f1(tipLy)} Q ${f1(34 - 8 * oL)} ${f1(33 + 8 * oL)} 32 46 ` +
+                 `L 46 ${f1(cleftY)} Q ${f1(38 - 6 * oL)} ${f1(28 + 14 * oL)} ${f1(tipLx)} ${f1(tipLy)} Z`;
+    const inRD = `M ${f1(tipRx)} ${f1(tipRy)} Q ${f1(86 + 8 * oR)} ${f1(33 + 8 * oR)} 88 46 ` +
+                 `L 74 ${f1(cleftY)} Q ${f1(82 + 6 * oR)} ${f1(28 + 14 * oR)} ${f1(tipRx)} ${f1(tipRy)} Z`;
+    eSideInL.setAttribute('d', inLD);
+    eSideInR.setAttribute('d', inRD);
+    eSideInL.setAttribute('opacity', (clamp01(oL * 1.3) * .85).toFixed(2));
+    eSideInR.setAttribute('opacity', (clamp01(oR * 1.3) * .85).toFixed(2));
+  } else {
+    eSideInL.setAttribute('opacity', 0);
+    eSideInR.setAttribute('opacity', 0);
+  }
+
+  // Deep dark oval throat opening between the 4 parted petals
+  const cavD = o > .015
+    ? `M ${f1(34 - 3 * oL)} ${f1(44 - 3 * oL)} Q 60 ${f1(backRim - 5 * oB)} ${f1(86 + 3 * oR)} ${f1(44 - 3 * oR)} ` +
+      `Q 74 ${f1(crouch + 3 * oF)} 60 ${f1(crouch + 1)} ` +
+      `Q 46 ${f1(crouch + 3 * oF)} ${f1(34 - 3 * oL)} ${f1(44 - 3 * oL)} Z`
+    : '';
+  eCavity.setAttribute('d', cavD);
+  eInnerGlow.setAttribute('d', cavD);
+  const pulse = .75 + .25 * Math.sin(t * 2.2);
+  eInnerGlow.setAttribute('opacity', (clamp01(o * 1.4) * .65 * pulse).toFixed(2));
+  eHalo.setAttribute('opacity', (o * pulse * .7).toFixed(2));
+
+  // Outer leathery skin of side petals + front petal curling down over the belly
+  const flY = crouch + 15 * oF;
+  const frontPetD = oF > .03
+    ? `M ${f1(45 - 3 * oF)} ${f1(crouch - 2)} Q 60 ${f1(flY + 5)} ${f1(75 + 3 * oF)} ${f1(crouch - 2)} ` +
+      `Q 60 ${f1(crouch + 3 * oF)} ${f1(45 - 3 * oF)} ${f1(crouch - 2)} Z`
+    : '';
+  eFrontLip.setAttribute('d', petLD + ' ' + petRD + ' ' + frontPetD);
+  if (oF > .04) {
+    eFrontIn.setAttribute('d',
+      `M ${f1(47 - 2 * oF)} ${f1(crouch - 1)} Q 60 ${f1(flY)} ${f1(73 + 2 * oF)} ${f1(crouch - 1)} ` +
+      `Q 60 ${f1(crouch + 2 * oF)} ${f1(47 - 2 * oF)} ${f1(crouch - 1)} Z`);
+    eFrontIn.setAttribute('opacity', (clamp01(oF * 1.3) * .85).toFixed(2));
+  } else {
+    eFrontIn.setAttribute('opacity', 0);
+  }
+
+  eFleshRim.setAttribute('opacity', clamp01(o * 1.3).toFixed(2));
+  eFleshRim.setAttribute('d', o > .03
+    ? `M ${f1(34 - 3 * oL)} ${f1(44 - 3 * oL)} Q 47 ${f1(crouch + 3 * oF)} 60 ${f1(crouch + 1)} Q 73 ${f1(crouch + 3 * oF)} ${f1(86 + 3 * oR)} ${f1(44 - 3 * oR)}`
+    : '');
+
+  // Sticky translucent strands stretching & snapping as the lobes part
+  const slimeOp = Math.sin(clamp01(o * 1.15) * Math.PI) * .65;
+  eSlime.setAttribute('opacity', slimeOp.toFixed(2));
+  if (slimeOp > .03) {
+    eSlime.setAttribute('d',
+      `M ${f1(tipLx + 5)} ${f1(tipLy + 1)} Q 60 ${f1(crouch - 5)} ${f1(tipRx - 5)} ${f1(tipRy + 1)} ` +
+      `M ${f1(60 - 16 * oL)} ${f1(tipLy + 3)} Q 57 ${f1(crouch)} ${f1(60 + 14 * oR)} ${f1(crouch - 2)} ` +
+      `M ${f1(60 - 7 * oL)} ${f1(backRim + 2)} L ${f1(60 + 5 * oR)} ${f1(crouch)}`);
+    eSlime.setAttribute('stroke-width', (1.05 - .55 * o).toFixed(2));
+  }
+
+  // Seam crevices: closed = 3-way slit from apex (60,18); open = cleft creases down the shell from (46,cleftY) and (74,cleftY)
+  const seamTopY = Math.max(18 + 30 * o, cleftY);
+  const topL = { x: 60 - 14 * smooth(o * 1.2), y: seamTopY };
+  const topR = { x: 60 + 14 * smooth(o * 1.2), y: seamTopY };
+  const seamD = `M ${f1(topL.x)} ${f1(topL.y)} C ${f1(50 - 4 * oL)} ${f1(31 + 13 * o)}, 46 44, 44 56 ` +
+                `M ${f1(topR.x)} ${f1(topR.y)} C ${f1(70 + 4 * oR)} ${f1(31 + 13 * o)}, 74 44, 76 56 ` +
+                (o < .18 ? `M 60 ${f1(19 + 22 * o)} L 60 39` : '');
+  eSeam.setAttribute('d', seamD);
+  eSeamHi.setAttribute('d', seamD);
+
+  // 3 articulated tendrils with independent progress & organic writhing
+  TENDRILS.forEach(tr => {
+    const e = clamp01(E[tr.key]);
+    if (e <= 0) {
+      [tr.inUnder, tr.inBone, tr.inHi, tr.shadow, tr.under, tr.bone, tr.hi, tr.claw].forEach(p => p.setAttribute('d', ''));
+      tr.joints.forEach(c => c.setAttribute('r', 0));
+      return;
+    }
+    const w1 = E.twitch * Math.sin(t * tr.freq1 + tr.phase) * 2.8;
+    const w2 = E.twitch * Math.cos(t * tr.freq2 + tr.phase * 1.3) * 2.4;
+    const p0 = tr.p0;
+    const p1o = { x: tr.p1.x + tr.jx * .5 + w1 * .5, y: tr.p1.y + tr.jy * .5 + w2 * .4 };
+    const p2o = { x: tr.p2.x + tr.jx + w1 * 1.1,     y: tr.p2.y + tr.jy - w2 * .8 };
+    const p3o = { x: tr.p3.x + tr.jx * 1.2 + w2 * 1.4, y: tr.p3.y + tr.jy + w1 * 1.3 };
+
+    const e1 = clamp01(e * 2.1), e2 = clamp01(e * 2.1 - .55), e3 = clamp01(e * 2.1 - 1.1);
     const p1 = lerpP(p0, p1o, e1), p2 = lerpP(p1, p2o, e2), p3 = lerpP(p2, p3o, e3);
-    const d = `M ${f1(p0.x)} ${f1(p0.y)} Q ${f1(p0.x + sgn)} ${f1((p0.y + p1.y) / 2)} ${f1(p1.x)} ${f1(p1.y)} ` +
-              `L ${f1(p2.x)} ${f1(p2.y)} L ${f1(p3.x)} ${f1(p3.y)}`;
-    under.setAttribute('d', d); bone.setAttribute('d', d);
-    hi.setAttribute('d', d); hi.setAttribute('transform', `translate(${-.4 * sgn} -.4)`);
-    claw.setAttribute('d', e3 > .6 ? `M ${f1(p3.x)} ${f1(p3.y)} q ${f1(-sgn * 1.2)} 2.2 ${f1(-sgn * 2.6)} 2.4` : '');
-    knuckles[0].setAttribute('cx', f1(p1.x)); knuckles[0].setAttribute('cy', f1(p1.y)); knuckles[0].setAttribute('r', e1 > .3 ? .95 : 0);
-    knuckles[1].setAttribute('cx', f1(p2.x)); knuckles[1].setAttribute('cy', f1(p2.y)); knuckles[1].setAttribute('r', e2 > .3 ? .8 : 0);
+
+    const dIn = `M ${f1(p0.x)} ${f1(p0.y)} Q ${f1(p0.x + tr.sgn * 3)} ${f1((p0.y + p1.y) * .5 - 2)} ${f1(p1.x)} ${f1(p1.y)}`;
+    tr.inUnder.setAttribute('d', dIn);
+    tr.inBone.setAttribute('d', dIn);
+    tr.inHi.setAttribute('d', dIn);
+
+    const dOut = e2 > 0
+      ? `M ${f1(p1.x)} ${f1(p1.y)} Q ${f1((p1.x + p2.x) * .5 + tr.sgn * 1.5)} ${f1((p1.y + p2.y) * .5 - 2)} ${f1(p2.x)} ${f1(p2.y)}` +
+        (e3 > 0 ? ` L ${f1(p3.x)} ${f1(p3.y)}` : '')
+      : '';
+    [tr.shadow, tr.under, tr.bone, tr.hi].forEach(p => p.setAttribute('d', dOut));
+    tr.hi.setAttribute('transform', `translate(${-.4 * tr.sgn} -.4)`);
+    tr.claw.setAttribute('d', e3 > .45
+      ? `M ${f1(p3.x)} ${f1(p3.y)} q ${f1(tr.sgn * 1.2)} 2.6 ${f1(-tr.sgn * 1.8)} 3.6`
+      : '');
+    tr.joints[0].setAttribute('cx', f1(p1.x)); tr.joints[0].setAttribute('cy', f1(p1.y)); tr.joints[0].setAttribute('r', e1 > .3 ? 1.25 : 0);
+    tr.joints[1].setAttribute('cx', f1(p2.x)); tr.joints[1].setAttribute('cy', f1(p2.y)); tr.joints[1].setAttribute('r', e2 > .25 ? 1.05 : 0);
   });
 }
 gsap.ticker.add(renderEgg);
@@ -1545,14 +1706,28 @@ let hatching = false;
 function hatch() {
   if (hatching || reduced) return;
   hatching = true;
-  gsap.timeline({ onComplete: () => { hatching = false; } })
-    .to(E, { open: .15, duration: .18, ease: 'power1.inOut', yoyo: true, repeat: 3 })
-    .to(E, { open: 1, duration: 1.3, ease: 'power2.out' })
-    .to(E, { out: 1, duration: 1.5, ease: 'power1.inOut' }, '-=.5')
-    .to(E, { twitch: 1, duration: .3 }, '-=.4')
-    .to(E, { twitch: 0, duration: .4 }, '+=1.8')
-    .to(E, { out: 0, duration: .55, ease: 'power3.in' })
-    .to(E, { open: 0, duration: .8, ease: 'power2.inOut' }, '-=.1');
+  randomizeTendrils();
+  // Shuffle the order in which the 3 tendrils emerge & retract each time
+  const order = ['t0', 't1', 't2'].sort(() => Math.random() - .5);
+  const [a, b, c] = order;
+  const tl = gsap.timeline({ onComplete: () => { hatching = false; } });
+  // 1. internal pressure pulse — apex cracks slightly, pauses, then peels wide open
+  tl.to(E, { swell: 1, open: .12, duration: .28, ease: 'sine.inOut' })
+    .to(E, { swell: .2, open: .05, duration: .22, ease: 'sine.in' })
+    .to(E, { swell: .85, open: .96, duration: 1.35, ease: 'power2.inOut' })
+    .to(E, { twitch: 1, duration: .3 }, '-=.9')
+    // 2. three tendrils creep out at staggered, randomized times & reaches
+    .to(E, { [a]: rand(.85, 1), duration: rand(.75, 1.05), ease: 'power2.out' }, '-=.85')
+    .to(E, { [b]: rand(.8, 1),  duration: rand(.8, 1.15),  ease: 'power2.out' }, '-=.65')
+    .to(E, { [c]: rand(.7, .95), duration: rand(.7, 1.0),  ease: 'power2.out' }, '-=.55')
+    // 3.异步 groping / recoil twitches while out
+    .to(E, { [a]: rand(.45, .7), duration: .38, ease: 'sine.inOut', yoyo: true, repeat: 1 }, '+=.15')
+    .to(E, { [b]: rand(.5, .75), duration: .42, ease: 'sine.inOut', yoyo: true, repeat: 1 }, '-=.25')
+    // 4. slip back into the dark one by one, then the 4 petals seal shut
+    .to(E, { [c]: 0, duration: .42, ease: 'power2.in' }, '+=.25')
+    .to(E, { [a]: 0, duration: .48, ease: 'power3.in' }, '-=.28')
+    .to(E, { [b]: 0, twitch: 0, duration: .45, ease: 'power3.in' }, '-=.32')
+    .to(E, { open: 0, swell: 0, duration: 1.05, ease: 'power2.inOut' }, '-=.15');
 }
 function hatchLoop() { gsap.delayedCall(rand(5, 9), () => { hatch(); hatchLoop(); }); }
 $('#egg').addEventListener('click', hatch);
@@ -1564,7 +1739,7 @@ if (reduced) {
   gsap.set('#blackout', { opacity: 0 });
   boot.forEach(l => log(l));
   placeImprint(MP, curType, INKS[curInk], true);
-  Object.assign(E, { open: .9, out: 1 });
+  Object.assign(E, { open: .95, t0: .9, t1: .85, t2: .8 });
 } else {
   gsap.set('#creature', { x: -340, y: -320 });
   gsap.timeline()
@@ -1717,25 +1892,57 @@ manual.addEventListener('click', e => { if (e.target === manual) closeManual(); 
 
 /* manual slides */
 const mmSlides = ['manual-intro.jpg', 'manual-1.jpg', 'manual-2.jpg', 'manual-3.jpg', 'manual-final.jpg'];
-const mmImg = $('#mmImg'), mmCnt = $('#mmCnt'), mmPrev = $('#mmPrev'), mmNext = $('#mmNext'), mmOrder = $('#mmOrder');
+const mmSlideBox = $('.mm-slide'), mmImg = $('#mmImg'), mmCnt = $('#mmCnt'),
+      mmPrev = $('#mmPrev'), mmNext = $('#mmNext'), mmOrder = $('#mmOrder');
 let mmIdx = 0;
-function mmSet(i, fade) {
-  mmIdx = Math.max(0, Math.min(mmSlides.length - 1, i));
+function mmSet(i, dir) {
+  const next = Math.max(0, Math.min(mmSlides.length - 1, i));
+  const changed = next !== mmIdx;
+  mmIdx = next;
   mmImg.src = mmSlides[mmIdx];
   mmImg.alt = `Инструкция — слайд ${mmIdx + 1}`;
   mmCnt.textContent = `${mmIdx + 1} / ${mmSlides.length}`;
   mmPrev.classList.toggle('hidden', mmIdx === 0);
   mmNext.classList.toggle('hidden', mmIdx === mmSlides.length - 1);
   mmOrder.classList.toggle('hidden', mmIdx !== mmSlides.length - 1);
-  if (fade && !reduced) gsap.fromTo(mmImg, { opacity: .3 }, { opacity: 1, duration: .28 });
+  if (dir && changed && !reduced) {
+    gsap.fromTo(mmImg, { x: dir * 48, opacity: .25 }, { x: 0, opacity: 1, duration: .28, ease: 'power2.out' });
+  } else {
+    gsap.set(mmImg, { x: 0, opacity: 1 });
+  }
 }
-const mmGo = d => mmSet(mmIdx + d, true);
+const mmGo = d => mmSet(mmIdx + d, d);
 $('#mmPrev').addEventListener('click', () => mmGo(-1));
 $('#mmNext').addEventListener('click', () => mmGo(1));
 mmOrder.addEventListener('click', () => {
   closeManual();
   $('#order').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
 });
+
+/* swipe / drag navigation on the slide (touch + mouse) */
+let swStartX = 0, swStartY = 0, swDx = 0, swActive = false;
+mmSlideBox.addEventListener('pointerdown', e => {
+  if (e.target.closest('#mmOrder') || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  swActive = true; swStartX = e.clientX; swStartY = e.clientY; swDx = 0;
+  mmSlideBox.setPointerCapture(e.pointerId);
+});
+mmSlideBox.addEventListener('pointermove', e => {
+  if (!swActive) return;
+  const dx = e.clientX - swStartX, dy = e.clientY - swStartY;
+  if (Math.abs(dy) > Math.abs(dx) * 1.3 && Math.abs(swDx) < 8) return;
+  swDx = dx;
+  const edge = (mmIdx === 0 && dx > 0) || (mmIdx === mmSlides.length - 1 && dx < 0) ? .25 : .65;
+  if (!reduced) gsap.set(mmImg, { x: dx * edge });
+});
+function endSwipe() {
+  if (!swActive) return;
+  swActive = false;
+  if (swDx < -45 && mmIdx < mmSlides.length - 1) mmGo(1);
+  else if (swDx > 45 && mmIdx > 0) mmGo(-1);
+  else if (!reduced) gsap.to(mmImg, { x: 0, duration: .2, ease: 'power2.out' });
+}
+mmSlideBox.addEventListener('pointerup', endSwipe);
+mmSlideBox.addEventListener('pointercancel', endSwipe);
 window.addEventListener('keydown', e => {
   if (!manual.classList.contains('open')) return;
   if (e.key === 'Escape') closeManual();
