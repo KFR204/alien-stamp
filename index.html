@@ -16,10 +16,10 @@
     --accent: #7fc796;
     --term: #8fd16a;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; scrollbar-width: none; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; scrollbar-width: none; overflow-x: hidden; background: var(--void); }
   body::-webkit-scrollbar { width: 0; height: 0; }
-  html, body { height: 100%; background: var(--void); overflow-x: hidden; color: var(--bone); font-family: 'IBM Plex Mono', monospace; }
+  body { min-height: 100%; background: var(--void); overflow-x: hidden; color: var(--bone); font-family: 'IBM Plex Mono', monospace; }
 
   .layer { position: absolute; inset: 0; width: 100%; height: 100%; }
   #bg { position: absolute; left: 0; top: 0; max-width: none; will-change: transform; }
@@ -53,19 +53,25 @@
 
   .ui { position: absolute; z-index: 20; }
 
-  #brand { top: 4.5vh; right: 4vw; text-align: right; }
+  #brand { top: 3.5vh; right: 4vw; text-align: right; }
   #brand h1 { display: flex; align-items: center; justify-content: flex-end; gap: .12em;
-    font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: clamp(24px, 3.6vw, 54px); line-height: 1;
+    font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: clamp(22px, 3.3vw, 52px); line-height: 1;
     letter-spacing: .32em; color: var(--bone); text-shadow: 0 0 30px rgba(127,199,150,.18); user-select: none; }
   #brand h1 span:last-child { margin-right: -.32em; }
   .alien-word { height: 1.9em; width: auto; margin-top: .18em; align-self: flex-start; mix-blend-mode: screen;
     filter: drop-shadow(0 0 10px rgba(143,214,63,.35)); }
+  #xenoLane { position: absolute; left: 0; top: 0; width: 100%; height: clamp(64px, 14vh, 150px); pointer-events: none; }
+  #xenoRun { position: absolute; left: 0; bottom: -22%; height: 100%; width: auto; visibility: hidden;
+    filter: brightness(1.5) drop-shadow(0 0 8px rgba(143,214,63,.35)); }
+  #xenoRun.opaque { mix-blend-mode: screen; }
+  @media (prefers-reduced-motion: reduce) { #xenoLane { display: none; } }
   #egg { height: 2.4em; width: auto; overflow: visible; margin: -.6em .1em -.25em -.05em; cursor: pointer;
     filter: drop-shadow(0 0 14px rgba(127,199,150,.18)); }
-  #brand p { margin-top: 30px; font-size: 16px; font-weight: 500; letter-spacing: .3em; color: #8ba092; text-transform: uppercase; }
+  #brand p { margin-top: clamp(10px, 1.8vh, 22px); font-size: clamp(11px, 1.05vw, 15px); font-weight: 500;
+    letter-spacing: .28em; color: #8ba092; text-transform: uppercase; }
 
   /* ---- monitor housing ---- */
-  #term { top: calc(4.5vh + clamp(24px, 3.6vw, 54px) * 2.2 + 50px); right: 4vw; width: min(430px, 42vw);
+  #term { top: calc(3.5vh + clamp(22px, 3.3vw, 52px) * 2.15 + clamp(28px, 4.2vh, 52px)); right: 4vw; width: min(420px, 38vw);
     padding: 22px 18px 34px 54px; border-radius: 12px 12px 8px 8px;
     background:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
@@ -302,13 +308,120 @@
   .rv { opacity: 0; transform: translateY(34px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
   .rv.vis { opacity: 1; transform: none; }
 
+  #mobManualBtn { display: none; }
+
+  /* ===== responsive: medium desktops / laptops / short screens ===== */
+  @media (max-width: 1480px) {
+    #panel { left: 2.5vw; bottom: 4vh; gap: 9px; }
+    .row > span { width: 78px; font-size: 8.5px; letter-spacing: .22em; }
+    .opt { font-size: 8.5px; letter-spacing: .16em; padding: 8px 10px 7px; }
+    #actions { right: 2.5vw; bottom: 4vh; gap: 8px; }
+    .btn { font-size: 10px; letter-spacing: .26em; padding: 14px 20px 13px 22px; }
+    .btn.ghost { padding: 14px 16px 13px 18px; }
+    #scrollHint { bottom: 4vh; font-size: 10.5px; letter-spacing: .22em; padding: 11px 16px 10px; }
+  }
+  @media (max-width: 1220px) and (min-width: 861px) {
+    #scrollHint { bottom: 13.5vh; }
+    #term { width: min(370px, 38vw); padding: 18px 14px 28px 46px; }
+    .keys { left: 10px; top: 24px; }
+    .keys i { width: 22px; height: 14px; }
+    .knob { left: 10px; top: 102px; width: 24px; height: 24px; }
+    #term::after { left: 46px; bottom: 9px; font-size: 7px; }
+    .screen { font-size: 10px; padding: 11px 12px 10px; }
+    #log { height: calc(1.7em * 5); }
+    .car-track .card { flex: 0 0 calc(50% - 9px); }
+  }
+  @media (max-height: 780px) and (min-width: 861px) {
+    #brand { top: 2.4vh; }
+    #brand p { margin-top: 8px; }
+    #term { top: calc(2.4vh + clamp(22px, 3.1vw, 44px) * 2.05 + 24px); padding: 16px 14px 26px 46px; }
+    #log { height: calc(1.7em * 5); }
+  }
+
+  /* ===== mobile & portrait tablet (<= 860px): dedicated Alien HUD layout ===== */
   @media (max-width: 860px) {
-    .order-wrap { grid-template-columns: 1fr; }
-    .ticket { position: static; width: auto; overflow-y: visible; }
-    .sec { padding: 70px 5vw 36px; }
-    #scrollHint { display: none; }
-    .car-track .card { flex-basis: 100%; }
-    .car-btn { width: 36px; height: 36px; font-size: 11px; }
+    #scene { height: 100vh; height: 100svh; min-height: 620px; display: flex; flex-direction: column;
+      justify-content: space-between; padding: 12px 14px 14px; }
+    .ui { position: relative; inset: auto !important; width: 100%; }
+
+    /* compact top header */
+    #brand { order: 1; text-align: center; padding-top: 2px; }
+    #brand h1 { justify-content: center; font-size: clamp(20px, 6.2vw, 34px); letter-spacing: .22em; gap: .1em; }
+    #brand h1 span:last-child { margin-right: -.22em; }
+    .alien-word { height: 1.75em; margin-top: .14em; }
+    #egg { height: 2.15em; margin: -.45em .06em -.2em -.04em; }
+    #xenoLane { height: clamp(50px, 10vh, 96px); }
+    #brand p { margin-top: 6px; font-size: clamp(9px, 2.5vw, 11.5px); letter-spacing: .22em; }
+
+    /* sleek horizontal MU/TH/UR 6000 status bar under header */
+    #term { order: 2; width: 100%; max-width: 520px; margin: 8px auto 0;
+      padding: 8px 10px 8px 42px; border-radius: 7px;
+      box-shadow: 0 12px 28px rgba(0,0,0,.75), 0 0 0 1px #12100c, inset 0 1px 0 rgba(255,240,200,.15); }
+    #term::before, #term::after, .keys { display: none; }
+    .knob { left: 8px; top: 50%; transform: translateY(-56%); width: 22px; height: 22px; }
+    .knob i { top: 2px; height: 7px; transform-origin: 50% 9px; }
+    .knob b { top: 24px; font-size: 6px; }
+    .screen { padding: 7px 10px 6px; border-radius: 8px; font-size: 9.5px; line-height: 1.45;
+      box-shadow: 0 0 0 3px #0b0c09, 0 0 0 4px #3a362c, inset 0 0 18px rgba(0,40,0,.7), 0 0 20px rgba(110,230,100,.2); }
+    #term .hd { margin-bottom: 3px; padding-bottom: 3px; font-size: 9px; }
+    #log { height: calc(1.45em * 2); }
+
+    /* middle interactive stage stays visible in between */
+    #journal { display: none; }
+    #mobManualBtn { order: 3; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      align-self: flex-start; margin-top: auto; margin-bottom: 8px; z-index: 22;
+      font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .18em;
+      text-transform: uppercase; color: #d6ead9; background: rgba(6,18,11,.88);
+      border: 1px solid #4c8c62; padding: 8px 13px 7px; cursor: pointer;
+      box-shadow: 0 0 18px rgba(127,199,150,.22); }
+    #mobManualBtn::before { content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: #8ef07a; box-shadow: 0 0 8px #8ef07a; }
+
+    /* bottom control deck */
+    #panel { order: 4; gap: 6px; background: rgba(2,7,4,.78); border: 1px solid #1a2a20;
+      padding: 8px 10px; backdrop-filter: blur(4px); }
+    .row { gap: 5px; }
+    .row > span { width: 62px; font-size: 8px; letter-spacing: .18em; flex-shrink: 0; }
+    .row .opt { flex: 1; text-align: center; font-size: 8.5px; letter-spacing: .12em; padding: 8px 4px 7px; white-space: nowrap; }
+    .sw { width: 6px; height: 6px; margin-right: 4px; }
+
+    #actions { order: 5; display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px; margin-top: 7px; }
+    .btn, .btn.ghost { width: 100%; padding: 12px 10px 11px; font-size: 9.5px; letter-spacing: .2em; text-align: center;
+      background: rgba(3,10,6,.84); }
+    #stampBtn { border-color: #355843; color: #e4efe2; }
+
+    #scrollHint { order: 6; position: relative; left: auto; bottom: auto; transform: none;
+      display: block; width: 100%; text-align: center; margin-top: 7px;
+      font-size: 10px; letter-spacing: .24em; padding: 10px 12px 9px; animation: none; }
+
+    /* content sections */
+    .sec { padding: 56px 16px 30px; }
+    .sec h2 { font-size: clamp(18px, 5.2vw, 26px); margin-bottom: 28px; letter-spacing: .1em; }
+    .grid { grid-template-columns: 1fr; gap: 14px; }
+    .card { padding: 20px 18px 18px; }
+    .card .stamp { width: 136px; height: 136px; margin: 0 auto 12px; }
+    .card h3 { min-height: 0; font-size: 12px; }
+    .order-wrap { grid-template-columns: 1fr; gap: 18px; }
+    .ticket { position: static; width: auto; overflow-y: visible; padding: 20px 18px; }
+    .chips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .chips .opt:last-child { grid-column: 1 / -1; }
+    .chips .opt { font-size: 9.5px; padding: 10px 8px; text-align: center; }
+    .fld input, .fld textarea { font-size: 16px; padding: 11px 12px; }
+    .step { gap: 14px; padding: 18px 16px; }
+    .step b { font-size: 11px; letter-spacing: .14em; }
+    .step p { font-size: 11.5px; }
+    .car-track .card { flex: 0 0 100%; }
+    .car-btn { width: 34px; height: 34px; font-size: 11px; }
+    .carousel { gap: 8px; }
+    #toTop { right: 14px; bottom: 14px; width: 40px; height: 40px; }
+
+    /* instruction modal on mobile */
+    .mm-frame { width: 96vw; max-height: 92vh; }
+    .mm-panel { max-height: calc(92vh - 2px); padding: 14px 12px 14px; }
+    .mm-hd { font-size: 9px; letter-spacing: .18em; margin-bottom: 12px; padding-bottom: 10px; }
+    #mmClose { width: 30px; height: 30px; font-size: 13px; }
+    #mmOrder { right: 5%; bottom: 5%; font-size: 9.5px; letter-spacing: .16em; padding: 9px 14px 8px 16px; }
+    .mm-nav { margin-top: 12px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .rv { opacity: 1; transform: none; transition: none; }
@@ -354,8 +467,8 @@
       </filter>
     </defs>
 
-    <polygon points="0,800 1200,800 1200,385 0,420" fill="url(#deskG)"/>
-    <path d="M0 420 L1200 385" stroke="#2f4a38" stroke-width="1.5"/>
+    <polygon points="-400,1500 1600,1500 1600,373 -400,432" fill="url(#deskG)"/>
+    <path d="M-400 432 L1600 373" stroke="#2f4a38" stroke-width="1.5"/>
     <ellipse cx="720" cy="600" rx="430" ry="160" fill="url(#poolG)"/>
 
     <g id="paperWrap">
@@ -431,18 +544,69 @@
           <path d="M 106 -11 V 8" stroke="#4a350c" stroke-width="1.2" opacity=".65"/>
         </g>
 
-        <!-- right-hand inner pages (visible when cover opens) -->
+        <!-- right-hand inner pages (visible when cover opens): abstract miniature of slide 1 -->
         <g id="jPages">
           <rect x="-100" y="-76" width="203" height="154" rx="2" fill="url(#pageRightG)" stroke="#5b503d" stroke-width="1"/>
+          <rect x="-92" y="-70" width="189" height="142" rx="1.5" fill="#08141c" stroke="#d4ccb4" stroke-width="2.2"/>
+          <!-- subtle sci-fi interior glow + top-right viewport with moon & ridges -->
+          <rect x="18" y="-68" width="76" height="36" rx="1.5" fill="#102534" stroke="#285068" stroke-width=".8"/>
+          <circle cx="76" cy="-54" r="10" fill="#4f7b91" opacity=".45"/>
+          <polygon points="20,-32 32,-48 41,-38 52,-53 63,-36 74,-44 92,-32" fill="#0a1822"/>
+          <!-- left header bars ("Что такое оснастка?" + 2 subtitle lines) -->
+          <rect x="-86" y="-56" width="84" height="6.5" rx="1" fill="#d9f2fa" opacity=".9"/>
+          <rect x="-86" y="-45" width="72" height="2.4" rx="1" fill="#7aa8ba" opacity=".7"/>
+          <rect x="-86" y="-40" width="58" height="2.4" rx="1" fill="#7aa8ba" opacity=".6"/>
+          <!-- left HUD frame with 3 numbered rows (01 / 02 / 03) -->
+          <polygon points="-86,-28 -22,-28 -16,-22 -16,52 -86,52" fill="rgba(8,28,38,.85)" stroke="#2ec4e6" stroke-width=".9"/>
+          <rect x="-81" y="-23" width="34" height="2.6" fill="#46d4f2" opacity=".8"/>
+          <!-- row 1 -->
+          <rect x="-81" y="-15" width="60" height="18" rx="1.5" fill="#0c2633" stroke="#1f6d82" stroke-width=".6"/>
+          <circle cx="-72" cy="-6" r="4.8" fill="none" stroke="#3dd2f0" stroke-width=".9"/>
+          <rect x="-63" y="-10" width="24" height="3" fill="#d4eff7" opacity=".85"/>
+          <rect x="-63" y="-4" width="34" height="2" fill="#6ea4b8" opacity=".65"/>
+          <!-- row 2 -->
+          <rect x="-81" y="7" width="60" height="18" rx="1.5" fill="#0c2633" stroke="#1f6d82" stroke-width=".6"/>
+          <circle cx="-72" cy="16" r="4.8" fill="none" stroke="#3dd2f0" stroke-width=".9"/>
+          <rect x="-63" y="12" width="20" height="3" fill="#d4eff7" opacity=".85"/>
+          <rect x="-63" y="18" width="36" height="2" fill="#6ea4b8" opacity=".65"/>
+          <!-- row 3 -->
+          <rect x="-81" y="29" width="60" height="18" rx="1.5" fill="#0c2633" stroke="#1f6d82" stroke-width=".6"/>
+          <circle cx="-72" cy="38" r="4.8" fill="none" stroke="#3dd2f0" stroke-width=".9"/>
+          <rect x="-63" y="34" width="38" height="3" fill="#d4eff7" opacity=".85"/>
+          <rect x="-63" y="40" width="26" height="2" fill="#6ea4b8" opacity=".65"/>
+          <!-- center: silhouette of automatic stamp mount (Colop) + round die with alien emblem -->
+          <g transform="translate(2 4)">
+            <!-- lower white/grey frame legs -->
+            <path d="M -13 10 H 11 V 46 H -13 Z" fill="#b7c6ce" stroke="#101820" stroke-width=".9"/>
+            <rect x="-9" y="16" width="16" height="24" fill="#09131a"/>
+            <ellipse cx="-1" cy="46" rx="15" ry="3.2" fill="#9fb0b8" stroke="#101820" stroke-width=".8"/>
+            <!-- white middle collar -->
+            <rect x="-13.5" y="1" width="25" height="9" rx="1" fill="#d7e2e8" stroke="#101820" stroke-width=".8"/>
+            <!-- black glossy upper cap -->
+            <path d="M -14 2 L -12 -32 C -12 -37, 10 -37, 10 -32 L 12 2 Z" fill="#101820" stroke="#4a6678" stroke-width=".8"/>
+            <path d="M -8 -31 V -2" stroke="#6aa0b8" stroke-width="1.3" opacity=".45"/>
+            <rect x="-5" y="-14" width="11" height="3" fill="#bcd4de" opacity=".75"/>
+            <!-- round stamp die leaning in front -->
+            <circle cx="14" cy="34" r="19" fill="#0d141a" stroke="#5b7888" stroke-width="1.1"/>
+            <circle cx="14" cy="34" r="15.5" fill="none" stroke="#9ab4c2" stroke-width=".7" stroke-dasharray="3 1.5"/>
+            <circle cx="14" cy="34" r="11.5" fill="none" stroke="#6d8999" stroke-width=".6"/>
+            <path d="M 14 23 C 18 23, 19 29, 17 35 C 16 39, 15 42, 14 43 C 13 42, 12 39, 11 35 C 9 29, 10 23, 14 23 Z" fill="#9ab4c2" opacity=".85"/>
+          </g>
+          <!-- right side: sub-heading + 3 text bars + cyan info callout box with (i) icon -->
+          <rect x="26" y="-22" width="64" height="5" rx="1" fill="#7be0f7" opacity=".85"/>
+          <rect x="26" y="-13" width="66" height="2.3" rx="1" fill="#9ec2d0" opacity=".7"/>
+          <rect x="26" y="-8" width="62" height="2.3" rx="1" fill="#9ec2d0" opacity=".7"/>
+          <rect x="26" y="-3" width="54" height="2.3" rx="1" fill="#9ec2d0" opacity=".6"/>
+          <polygon points="30,10 92,10 96,14 96,38 30,38 26,34 26,14" fill="rgba(8,30,40,.9)" stroke="#33cef0" stroke-width=".9"/>
+          <circle cx="35" cy="24" r="5.2" fill="none" stroke="#42d8f7" stroke-width="1.1"/>
+          <line x1="35" y1="22" x2="35" y2="27" stroke="#42d8f7" stroke-width="1.3"/>
+          <rect x="44" y="17" width="46" height="2.4" fill="#bcebf7" opacity=".8"/>
+          <rect x="44" y="22.5" width="42" height="2.2" fill="#7aa8ba" opacity=".7"/>
+          <rect x="44" y="28" width="32" height="2.2" fill="#7aa8ba" opacity=".6"/>
+          <!-- wet floor reflection streaks at the bottom -->
+          <path d="M -86 62 H 94 M -70 67 H 82" stroke="#2b586e" stroke-width="1" opacity=".45"/>
           <!-- gutter shadow near spine -->
-          <rect x="-100" y="-76" width="22" height="154" fill="#000" opacity=".22"/>
-          <!-- schematic diagram of a stamp mount + callouts -->
-          <rect x="-72" y="-58" width="76" height="54" fill="none" stroke="#4b402f" stroke-width="1.3"/>
-          <circle cx="-34" cy="-31" r="18" fill="none" stroke="#8c1a12" stroke-width="1.4" stroke-dasharray="3 2"/>
-          <path d="M -44 -48 H -24 L -20 -34 H -48 Z" fill="none" stroke="#4b402f" stroke-width="1.2"/>
-          <path d="M 16 -56 H 86 M 16 -44 H 82 M 16 -32 H 86 M 16 -20 H 68" stroke="#5e5241" stroke-width="2"/>
-          <path d="M -72 10 H 86 M -72 22 H 82 M -72 34 H 86 M -72 46 H 74 M -72 58 H 60" stroke="#6f624d" stroke-width="1.4" opacity=".8"/>
-          <text x="16" y="-4" font-family="Unbounded" font-weight="500" font-size="6.2" fill="#8c1a12" letter-spacing=".6">СХЕМА ОСНАСТКИ</text>
+          <rect x="-100" y="-76" width="20" height="154" fill="#000" opacity=".38"/>
         </g>
 
         <!-- spine ridge (always stays at the hinge x=-100) -->
@@ -500,6 +664,11 @@
 
     <polygon id="cone" points="650,-10 800,-10 1060,800 380,800" fill="url(#coneG)" style="mix-blend-mode:screen"/>
   </svg>
+
+  <div id="xenoLane" aria-hidden="true"><video id="xenoRun" muted loop playsinline preload="auto">
+    <source src="xenomorph-run-loop.webm" type="video/webm">
+    <source src="xenomorph-run-loop.mp4" type="video/mp4">
+  </video></div>
 
   <!-- ===== FOREGROUND: the creature ===== -->
   <svg id="fg" class="layer" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
@@ -741,6 +910,8 @@
   <p>Изготовление печатей и штампов</p>
 </div>
 
+<button type="button" id="mobManualBtn">Инструкция по оснастке</button>
+
 <div class="ui" id="panel">
   <div class="row"><span>ФОРМА</span>
     <button class="opt on" data-type="round">Круглая</button>
@@ -846,7 +1017,7 @@
         </div>
         <div class="fld">
           <label for="oComm">Комментарий</label>
-          <textarea id="oComm" placeholder="Сроки, оснастка, доставка — любые детали"></textarea>
+          <textarea id="oComm" placeholder="Сроки, размер, оснастка, доставка — любые детали"></textarea>
         </div>
       </form>
       <aside class="ticket rv">
@@ -910,9 +1081,9 @@
     <div class="sec-no">// СВЯЗЬ</div>
     <h2>Контакты</h2>
     <div class="grid">
-      <a class="c-link rv" href="tel:+70000000000"><span class="net">Телефон</span><span class="val">+7 (000) 000-00-00</span></a>
+      <a class="c-link rv" href="tel:+79939889959"><span class="net">Телефон</span><span class="val">+7 (993) 988-99-59</span></a>
       <a class="c-link rv" href="https://t.me/alien_stamp" target="_blank" rel="noopener"><span class="net">Telegram</span><span class="val">@alien_stamp</span></a>
-      <a class="c-link rv" href="https://wa.me/70000000000" target="_blank" rel="noopener"><span class="net">WhatsApp</span><span class="val">+7 (000) 000-00-00</span></a>
+      <a class="c-link rv" href="https://wa.me/79313089959" target="_blank" rel="noopener"><span class="net">WhatsApp</span><span class="val">+7 (931) 308-99-59</span></a>
       <a class="c-link rv" href="https://vk.com/alien_stamp" target="_blank" rel="noopener"><span class="net">VK</span><span class="val">vk.com/alien_stamp</span></a>
     </div>
   </div></section>
@@ -1144,19 +1315,59 @@ const clientToWorld = (cx, cy) => pt(cx, cy).matrixTransform(worldSvg.getScreenC
 const clientToPaper = (cx, cy) => pt(cx, cy).matrixTransform(paperG.getScreenCTM().inverse());
 const paperToWorld = l => pt(l.x, l.y).matrixTransform(paperG.getScreenCTM()).matrixTransform(worldSvg.getScreenCTM().inverse());
 const lookAt = w => S.look = gsap.utils.clamp(8, 72, Math.atan2(w.y - PIV.y, w.x - PIV.x) * 180 / Math.PI);
+const fgSvg = $('#fg'), brandEl = $('#brand'), termEl = $('#term');
+function layoutWorld() {
+  const W = innerWidth, H = innerHeight, ar = W / Math.max(H, 1);
+  let vb = '0 0 1200 800';
+  if (W <= 860) {
+    // Mobile / portrait: frame the Xenomorph head (left-top) + contract paper (center-right)
+    // so the entire paper including the М.П. stamp circle sits cleanly above the bottom HUD
+    const vw = 780, vh = Math.round(vw / Math.max(ar, .42));
+    const vy = Math.round(455 - vh * .44);
+    vb = `195 ${vy} ${vw} ${vh}`;
+    termEl.style.top = '';
+  } else {
+    if (ar < 1.45) {
+      // 4:3 / 5:4 / narrow desktop: keep full 0..1200 width visible so neither journal nor paper clips
+      const vw = 1200, vh = Math.round(vw / ar);
+      const vy = Math.round(430 - vh * .52);
+      vb = `0 ${vy} ${vw} ${vh}`;
+    }
+    termEl.style.top = `${brandEl.offsetTop + brandEl.offsetHeight + 28}px`;
+  }
+  worldSvg.setAttribute('viewBox', vb);
+  fgSvg.setAttribute('viewBox', vb);
+  updateRunLane();
+}
+// the lane follows the desk edge line (world coords -400,432 → 1600,373) in screen space
+const runLane = $('#xenoLane');
+function updateRunLane() {
+  const ctm = worldSvg.getScreenCTM();
+  if (!ctm) return;
+  const p = worldSvg.createSVGPoint();
+  p.x = 0; p.y = 424; const a = p.matrixTransform(ctm);
+  p.x = 1200; p.y = 385; const b = p.matrixTransform(ctm);
+  runLane.style.top = `${a.y - runLane.offsetHeight}px`;
+  runLane.style.transformOrigin = '0 100%';
+  runLane.style.transform = `rotate(${Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI}deg)`;
+}
 /* background photo: place the tunnel's vanishing point into the free area of the scene */
 const bgImg = $('#bg'), BG_VP = { x: .70, y: .75 };
 function layoutBg() {
+  layoutWorld();
   const ar = (bgImg.naturalWidth || 1024) / (bgImg.naturalHeight || 341);
-  const W = innerWidth, H = innerHeight, sx = .55 * W, sy = .38 * H;
+  const W = innerWidth, H = innerHeight, sx = (W <= 860 ? .5 : .55) * W, sy = (W <= 860 ? .34 : .38) * H;
   // smallest size that still covers the screen above the desk edge (+ parallax margin)
-  const h = 1.06 * Math.max(sy / BG_VP.y, (.65 * H - sy) / (1 - BG_VP.y),
+  const h = 1.08 * Math.max(sy / BG_VP.y, (.72 * H - sy) / (1 - BG_VP.y),
     sx / (BG_VP.x * ar), (W - sx) / ((1 - BG_VP.x) * ar));
   const w = h * ar;
   Object.assign(bgImg.style, { width: `${w}px`, height: `${h}px`,
     left: `${sx - BG_VP.x * w}px`, top: `${sy - BG_VP.y * h}px` });
 }
+layoutWorld();
 bgImg.complete ? layoutBg() : bgImg.addEventListener('load', layoutBg);
+addEventListener('load', layoutBg);
+document.fonts && document.fonts.ready && document.fonts.ready.then(layoutWorld);
 addEventListener('resize', layoutBg);
 
 const bgX = gsap.quickTo('#bg', 'x', { duration: 1.2, ease: 'power2.out' }),
@@ -1732,6 +1943,26 @@ function hatch() {
 function hatchLoop() { gsap.delayedCall(rand(5, 9), () => { hatch(); hatchLoop(); }); }
 $('#egg').addEventListener('click', hatch);
 
+/* ---------- xenomorph sprint: runs along the desk edge across the whole screen ---------- */
+const xenoRun = $('#xenoRun');
+function xenoSprint() {
+  const w = xenoRun.offsetWidth;
+  if (!w) return gsap.delayedCall(1, xenoSprint);
+  const dist = innerWidth + w * .1;
+  xenoRun.currentTime = 0;
+  xenoRun.play().catch(() => {});
+  gsap.fromTo(xenoRun, { x: -w, visibility: 'visible' }, {
+    x: dist, duration: (dist + w) / (runLane.offsetHeight * 2.2), ease: 'none',
+    onComplete: () => { xenoRun.pause(); gsap.set(xenoRun, { visibility: 'hidden' }); gsap.delayedCall(rand(5, 10), xenoSprint); }
+  });
+}
+if (!reduced) {
+  xenoRun.addEventListener('loadeddata', () => {
+    xenoRun.classList.toggle('opaque', /\.mp4$/.test(xenoRun.currentSrc));
+  }, { once: true });
+  gsap.delayedCall(3.5, xenoSprint);
+}
+
 /* ---------- intro ---------- */
 const boot = ['MU/TH/UR 6000 — ИНТЕРФЕЙС ОТТИСКА', 'ИНИЦИАЛИЗАЦИЯ БИОМЕХАНИЗМА...', 'ДОКУМЕНТ ОБНАРУЖЕН',
               'КЛИК ПО ДОКУМЕНТУ = ЦЕЛЬ', 'КЛИК ВКЛЮЧАЕТ ЗВУК · M — ВЫКЛ'];
@@ -1887,6 +2118,15 @@ journal.addEventListener('click', e => {
     .add(() => sfx.hiss(.22), .18)
     .add(openManual, .58);
 });
+$('#mobManualBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  if (jOpen) return;
+  jOpen = true;
+  sfx.snap();
+  log('ОТКРЫТА ИНСТРУКЦИЯ — ВЫБОР ОСНАСТКИ');
+  J.p = 1; renderJournal();
+  openManual();
+});
 $('#mmClose').addEventListener('click', closeManual);
 manual.addEventListener('click', e => { if (e.target === manual) closeManual(); });
 
@@ -1952,19 +2192,22 @@ window.addEventListener('keydown', e => {
 
 /* ---------- back to top ---------- */
 const toTop = $('#toTop');
-const pageScroller = () => document.body;
-const pageScrollTop = () => pageScroller().scrollTop;
-pageScroller().addEventListener('scroll',
-  () => toTop.classList.toggle('vis', pageScrollTop() > innerHeight * .8), { passive: true });
-toTop.addEventListener('click', () =>
-  pageScroller().scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }));
+const pageScrollTop = () => window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+const onPageScroll = () => toTop.classList.toggle('vis', pageScrollTop() > innerHeight * .8);
+window.addEventListener('scroll', onPageScroll, { passive: true });
+document.body.addEventListener('scroll', onPageScroll, { passive: true });
+toTop.addEventListener('click', () => {
+  const opts = { top: 0, behavior: reduced ? 'auto' : 'smooth' };
+  window.scrollTo(opts);
+  document.body.scrollTo(opts);
+});
 
 /* ---------- reviews carousel ---------- */
 const revTrack = $('#revTrack'), revDots = $('#revDots');
 const revCards = revTrack.children.length;
 let revIdx = 0, revTimer = 0;
-const revPerView = () => innerWidth <= 860 ? 1 : 3;
-const revPages = () => revCards - revPerView() + 1;
+const revPerView = () => innerWidth <= 860 ? 1 : innerWidth <= 1220 ? 2 : 3;
+const revPages = () => Math.max(1, revCards - revPerView() + 1);
 function revGo(i) {
   revIdx = (i + revPages()) % revPages();
   revTrack.style.transform = `translateX(${-revIdx * (revTrack.children[0].offsetWidth + 18)}px)`;
@@ -1977,13 +2220,23 @@ function revBuild() {
     d.addEventListener('click', () => revGo(k));
     revDots.appendChild(d);
   }
-  revGo(revIdx);
+  revGo(Math.min(revIdx, revPages() - 1));
 }
 function revAuto() { clearInterval(revTimer); revTimer = setInterval(() => revGo(revIdx + 1), 7000); }
 $('#revPrev').addEventListener('click', () => { revGo(revIdx - 1); revAuto(); });
 $('#revNext').addEventListener('click', () => { revGo(revIdx + 1); revAuto(); });
 $('.carousel').addEventListener('mouseenter', () => clearInterval(revTimer));
 $('.carousel').addEventListener('mouseleave', revAuto);
+let carX = 0, carSw = false;
+const carView = $('.car-view');
+carView.addEventListener('pointerdown', e => { carSw = true; carX = e.clientX; });
+carView.addEventListener('pointerup', e => {
+  if (!carSw) return;
+  carSw = false;
+  const dx = e.clientX - carX;
+  if (Math.abs(dx) > 40) { revGo(revIdx + (dx < 0 ? 1 : -1)); revAuto(); }
+});
+carView.addEventListener('pointercancel', () => { carSw = false; });
 window.addEventListener('resize', revBuild);
 revBuild(); revAuto();
 
